@@ -1,0 +1,31 @@
+name: Feature Request
+description: I want to propose a new feature.
+labels: ["kind/feature", "status/triage"]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: Describe the feature at a high-level.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Discussion
+      description: |
+        If there has been a discussion around the feature, provide a link to the discussion.
+
+        Please note that all, except small requests, should be discussed through [GitHub Discussion](https://github.com/flomesh-io/pipy-demos/discussions/categories/ideas).
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Motivation
+      description: Describe why the feature should be added.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Details
+      description: Design ideas? Implementation ideas? Anything that will give us more context about the feature you are proposing!
+    validations:
+      required: false

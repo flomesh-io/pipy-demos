@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/flomesh-io/pipy-demos/discussions
+    about: Propose new ideas, provide feedback, or ask for help here
+  - name: Slack channel
+    url: https://join.slack.com/t/flomesh-io/shared_invite/zt-13pgb69qr-PLwebvtxXHdv6jc686ru0w
+    about: Ask and answer questions here
+  - name: "Security issues"
+    url: mailto:security@flomesh.io
+    about: "For security issues, please email to security@flomesh.io"
