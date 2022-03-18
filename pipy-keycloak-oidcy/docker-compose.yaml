@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  pipy-oidc:
+    image: naqvis/pipy-pjs:0.22.0-31
+    hostname: gateway
+    volumes:
+      - "./pipy-keycloak:/pipy-keycloak:Z"
+    environment:
+      - PIPY_CONFIG_FILE=/pipy-keycloak/proxy.js
+    networks:
+      pipynet:
+        ipv4_address: 172.25.0.2
+
+    depends_on:
+      - keycloak
+      - pipy-mock
+    ports:
+      - "8000:8000"
+
+  pipy-mock:
+    image: naqvis/pipy-pjs:0.22.0-31
+    hostname: mock
+    volumes:
+      - "./pipy-mock:/pipy-mock:Z"
+    environment:
+      - PIPY_CONFIG_FILE=/pipy-mock/services.js
+    networks:
+      pipynet:
+        ipv4_address: 172.25.0.3
+  
+  keycloak:
+    image: jboss/keycloak
+    command: 
+      [
+        "-Dkeycloak.migration.action=import",
+        "-Dkeycloak.migration.provider=singleFile",
+        "-Dkeycloak.migration.file=/pipy_realm/pipy_realm.json",
+        "-Dkeycloak.migration.strategy=IGNORE_EXISTING",
+        "-Dkeycloak.profile.feature.upload_scripts=enabled"
+      ]
+    volumes:
+      - "./keycloak/realms:/pipy_realm:Z"
+    networks:
+      pipynet:
+        ipv4_address: 172.25.0.4
+        aliases:
+          - keycloak.localtest.me
+    ports:
+      - "8080:8080"
+  
+networks:
+  pipynet:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/29

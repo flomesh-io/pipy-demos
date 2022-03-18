@@ -1,0 +1,7 @@
+{
+  "oauth": {
+    "issuer" : "http://gateway.localtest.me:8000/auth/realms/pipy-realm",
+    "pubkey" : "keys/pubkey.pem",
+    "services": ["service-user", "service-admin"]
+  }
+}

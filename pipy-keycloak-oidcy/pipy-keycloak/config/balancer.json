@@ -1,0 +1,7 @@
+{
+  "services": {
+    "service-user"      : ["mock:8081"],
+    "service-admin"    :  ["mock:8082"],
+    "service-keycloak" : ["keycloak:8080"]
+  }
+}

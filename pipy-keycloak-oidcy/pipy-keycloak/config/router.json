@@ -1,0 +1,7 @@
+{
+  "routes": {
+    "/user": { "service": "service-user", "role": "USER" },
+    "/admin": { "service": "service-admin", "role": "ADMIN" },
+    "/auth/*": { "service": "service-keycloak"}
+  }
+}
