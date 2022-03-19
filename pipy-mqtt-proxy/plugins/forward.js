@@ -16,7 +16,4 @@ pipy({
   .decodeMQTT({
     protocolLevel: () => _protocolLevel,
   })
-  .handleMessageStart(
-    msg => console.log(msg.head)
-  )
 )(JSON.decode(pipy.load('config/main.json')))
