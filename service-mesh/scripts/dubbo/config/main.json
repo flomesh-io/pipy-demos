@@ -1,0 +1,20 @@
+{
+  "inboundPlugins": [
+    "plugins/router.js",
+    "plugins/logger.js",
+    "plugins/inbound/ban.js",
+    "plugins/inbound/throttle.js",
+    "plugins/inbound/inbound.js"
+  ],
+  "outboundPlugins": [
+    "plugins/router.js",
+    "plugins/logger.js",
+    "plugins/metric.js",
+    "plugins/circuit-breaker.js",
+    "plugins/forward.js"
+  ],
+  "tasks": [
+    "tasks/heartbeat.js",
+    "tasks/status.js"
+  ]
+}

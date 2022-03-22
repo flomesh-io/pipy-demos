@@ -1,0 +1,8 @@
+{
+  "services": {
+    "reviews": {
+      "white": [],
+      "black": []
+    }
+  }
+}

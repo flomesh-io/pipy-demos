@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-api-gateway
+  name: samples-api-gateway
+spec:
+  ports:
+  - name: app
+    port: 10000
+    protocol: TCP
+    targetPort: 10000
+  - name: sidecar
+    port: 10010
+    protocol: TCP
+    targetPort: 10010
+  selector:
+    app: samples-api-gateway
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-api-gateway
+  name: samples-api-gateway-node
+spec:
+  type: NodePort
+  ports:
+  - name: sidecar
+    port: 10010
+    protocol: TCP
+    targetPort: 10010
+    nodePort: 30010
+  selector:
+    app: samples-api-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-api-gateway
+  name: samples-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-api-gateway
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        "app.flomesh.io/name": "samples-api-gateway"
+        "app.flomesh.io/port": "10000"
+      labels:
+        app: samples-api-gateway
+    spec:
+      containers:
+      - image: flomesh/samples-api-gateway:latest
+        name: app
+        resources: {}
+        ports:
+          - containerPort: 10000   
+        env:
+          - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+            value: 'samples-discovery-server'
+          - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+            value: "8761"               
+status: {}

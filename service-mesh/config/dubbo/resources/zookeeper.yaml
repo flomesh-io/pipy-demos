@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: zookeeper
+  name: zookeeper
+  namespace: dubbo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - image: zookeeper:3.7.0
+        imagePullPolicy: IfNotPresent
+        name: zookeeper
+        ports:
+        - containerPort: 2181
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: zookeeper
+    app.flomesh.io/type: dubbo
+  name: zookeeper
+spec:
+  ports:
+  - port: 2181
+    protocol: TCP
+    targetPort: 2181
+  selector:
+    app: zookeeper
+    app.flomesh.io/type: dubbo
+  type: ClusterIP
+status:
+  loadBalancer: {}

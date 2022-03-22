@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  version: 'v3'
+nameSuffix: '-v3'
+resources:
+  - ../resources/bookinfo-reviews.yaml
+
+images:
+  - name: flomesh/examples-bookinfo-reviews
+    newName: flomesh/examples-bookinfo-reviews-v3
+    newTag: latest
+
+patches:
+  - path: ../patches/sidecar-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/deploy-patch.yaml
+    target:
+      kind: Deployment      
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/imagePullPolicy
+        value: Always  
+    target:
+      kind: Deployment  
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/ports/0/containerPort #container index is 1 after sidecar injected
+        value: 8080
+    target:
+      kind: Deployment
+  - patch: |-
+      - op: add
+        path: /spec/ports/0/targetPort
+        value: 8090
+    target:
+      kind: Service

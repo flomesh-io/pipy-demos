@@ -1,0 +1,474 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bookinfo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: details
+    service: details
+  name: details
+  namespace: bookinfo
+spec:
+  ports:
+  - name: http
+    port: 9080
+    targetPort: 8090
+  selector:
+    app: details
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: productpage
+    service: productpage
+  name: productpage
+  namespace: bookinfo
+spec:
+  ports:
+  - name: http
+    nodePort: 30088
+    port: 9080
+    targetPort: 8090
+  selector:
+    app: productpage
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ratings
+    service: ratings
+  name: ratings
+  namespace: bookinfo
+spec:
+  ports:
+  - name: http
+    port: 9080
+    targetPort: 8090
+  selector:
+    app: ratings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: reviews
+    service: reviews
+    version: v1
+  name: reviews-v1
+  namespace: bookinfo
+spec:
+  ports:
+  - name: http
+    port: 9080
+    targetPort: 8090
+  selector:
+    app: reviews
+    version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: reviews
+    service: reviews
+    version: v2
+  name: reviews-v2
+  namespace: bookinfo
+spec:
+  ports:
+  - name: http
+    port: 9080
+    targetPort: 8090
+  selector:
+    app: reviews
+    version: v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: reviews
+    service: reviews
+    version: v3
+  name: reviews-v3
+  namespace: bookinfo
+spec:
+  ports:
+  - name: http
+    port: 9080
+    targetPort: 8090
+  selector:
+    app: reviews
+    version: v3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: details
+    sidecar-injected: "true"
+  name: details
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: details
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: details
+        app.flomesh.io/port: "8080"
+      labels:
+        app: details
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+      - image: flomesh/examples-bookinfo-details-v1:latest
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+      hostAliases:
+      - hostnames:
+        - reviews
+        - details
+        - ratings
+        ip: 127.0.0.1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: productpage
+    sidecar-injected: "true"
+  name: productpage
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: productpage
+        app.flomesh.io/port: "8080"
+      labels:
+        app: productpage
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+      - image: flomesh/examples-bookinfo-productpage-v1:latest
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      hostAliases:
+      - hostnames:
+        - reviews
+        - details
+        - ratings
+        ip: 127.0.0.1
+      volumes:
+      - emptyDir: {}
+        name: tmp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ratings
+    sidecar-injected: "true"
+  name: ratings
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ratings
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: ratings
+        app.flomesh.io/port: "8080"
+      labels:
+        app: ratings
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+      - image: flomesh/examples-bookinfo-ratings-v1:latest
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+      hostAliases:
+      - hostnames:
+        - reviews
+        - details
+        - ratings
+        ip: 127.0.0.1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reviews
+    sidecar-injected: "true"
+    version: v1
+  name: reviews-v1
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews
+      version: v1
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: reviews
+        app.flomesh.io/port: "8080"
+      labels:
+        app: reviews
+        version: v1
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+      - env:
+        - name: LOG_DIR
+          value: /tmp/logs
+        image: flomesh/examples-bookinfo-reviews-v1:latest
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /opt/ibm/wlp/output
+          name: wlp-output
+      hostAliases:
+      - hostnames:
+        - reviews
+        - details
+        - ratings
+        ip: 127.0.0.1
+      volumes:
+      - emptyDir: {}
+        name: wlp-output
+      - emptyDir: {}
+        name: tmp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reviews
+    sidecar-injected: "true"
+    version: v2
+  name: reviews-v2
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews
+      version: v2
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: reviews
+        app.flomesh.io/port: "8080"
+      labels:
+        app: reviews
+        version: v2
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+      - env:
+        - name: LOG_DIR
+          value: /tmp/logs
+        image: flomesh/examples-bookinfo-reviews-v2:latest
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /opt/ibm/wlp/output
+          name: wlp-output
+      hostAliases:
+      - hostnames:
+        - reviews
+        - details
+        - ratings
+        ip: 127.0.0.1
+      volumes:
+      - emptyDir: {}
+        name: wlp-output
+      - emptyDir: {}
+        name: tmp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reviews
+    sidecar-injected: "true"
+    version: v3
+  name: reviews-v3
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews
+      version: v3
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: reviews
+        app.flomesh.io/port: "8080"
+      labels:
+        app: reviews
+        version: v3
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+      - env:
+        - name: LOG_DIR
+          value: /tmp/logs
+        image: flomesh/examples-bookinfo-reviews-v3:latest
+        imagePullPolicy: Always
+        name: app
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /opt/ibm/wlp/output
+          name: wlp-output
+      hostAliases:
+      - hostnames:
+        - reviews
+        - details
+        - ratings
+        ip: 127.0.0.1
+      volumes:
+      - emptyDir: {}
+        name: wlp-output
+      - emptyDir: {}
+        name: tmp

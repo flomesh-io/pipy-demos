@@ -1,0 +1,7 @@
+{
+  "services": {
+    "samples-bookinfo-reviews": {
+      "rateLimit": 10
+    }
+  }
+}

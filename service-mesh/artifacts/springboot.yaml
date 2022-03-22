@@ -1,0 +1,1086 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: springboot
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-api-gateway
+    app.flomesh.io/type: springboot
+  name: samples-api-gateway
+  namespace: springboot
+spec:
+  ports:
+  - name: app
+    port: 10000
+    protocol: TCP
+    targetPort: 10000
+  - name: sidecar
+    port: 10010
+    protocol: TCP
+    targetPort: 10010
+  selector:
+    app: samples-api-gateway
+    app.flomesh.io/type: springboot
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-api-gateway
+    app.flomesh.io/type: springboot
+  name: samples-api-gateway-node
+  namespace: springboot
+spec:
+  ports:
+  - name: sidecar
+    nodePort: 30010
+    port: 10010
+    protocol: TCP
+    targetPort: 10010
+  selector:
+    app: samples-api-gateway
+    app.flomesh.io/type: springboot
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-bookinfo-details
+    app.flomesh.io/type: springboot
+  name: samples-bookinfo-details
+  namespace: springboot
+spec:
+  ports:
+  - port: 8103
+    protocol: TCP
+    targetPort: 8103
+  selector:
+    app: samples-bookinfo-details
+    app.flomesh.io/type: springboot
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-bookinfo-productpage
+  name: samples-bookinfo-productpage
+  namespace: springboot
+spec:
+  ports:
+  - nodePort: 30080
+    port: 9080
+    protocol: TCP
+    targetPort: 9080
+  selector:
+    app: samples-bookinfo-productpage
+  type: NodePort
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-bookinfo-ratings
+    app.flomesh.io/type: springboot
+  name: samples-bookinfo-ratings
+  namespace: springboot
+spec:
+  ports:
+  - port: 8101
+    protocol: TCP
+    targetPort: 8101
+  selector:
+    app: samples-bookinfo-ratings
+    app.flomesh.io/type: springboot
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-bookinfo-reviews
+    version: v1
+  name: samples-bookinfo-reviews-v1
+  namespace: springboot
+spec:
+  ports:
+  - port: 8102
+    protocol: TCP
+    targetPort: 8102
+  selector:
+    app: samples-bookinfo-reviews
+    version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-bookinfo-reviews
+    version: v2
+  name: samples-bookinfo-reviews-v2
+  namespace: springboot
+spec:
+  ports:
+  - port: 8102
+    protocol: TCP
+    targetPort: 8102
+  selector:
+    app: samples-bookinfo-reviews
+    version: v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-config-service
+    app.flomesh.io/type: springboot
+  name: samples-config-service
+  namespace: springboot
+spec:
+  ports:
+  - port: 8888
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: samples-config-service
+    app.flomesh.io/type: springboot
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: samples-discovery-server
+    app.flomesh.io/type: springboot
+  name: samples-discovery-server
+  namespace: springboot
+spec:
+  ports:
+  - port: 8761
+    protocol: TCP
+    targetPort: 8761
+  selector:
+    app: samples-discovery-server
+    app.flomesh.io/type: springboot
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-api-gateway
+    app.flomesh.io/type: springboot
+    sidecar-injected: "true"
+  name: samples-api-gateway
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-api-gateway
+      app.flomesh.io/type: springboot
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: samples-api-gateway
+        app.flomesh.io/port: "10000"
+      labels:
+        app: samples-api-gateway
+        app.flomesh.io/type: springboot
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      - env:
+        - name: eureka.instance.metadataMap.mesh
+          value: "true"
+        - name: eureka.instance.metadataMap.tag
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+          value: 127.0.0.1
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+          value: "8771"
+        image: flomesh/samples-api-gateway:latest
+        name: app
+        ports:
+        - containerPort: 10000
+        resources: {}
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-config-service 8888; \
+            do echo "Waiting for config service ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-config
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-bookinfo-details
+    app.flomesh.io/type: springboot
+    sidecar-injected: "true"
+  name: samples-bookinfo-details
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-bookinfo-details
+      app.flomesh.io/type: springboot
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: samples-bookinfo-details
+        app.flomesh.io/port: "8103"
+      labels:
+        app: samples-bookinfo-details
+        app.flomesh.io/type: springboot
+    spec:
+      containers:
+      - env:
+        - name: _samples_pod_ns
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: _samples_pod_nodeName
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: _samples_pod_name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: _samples_pod_serviceName
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _samples_pod_serviceVersion
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['version']
+        - name: _samples_pod_serviceFullName
+          value: $(_samples_pod_serviceName)-$(_samples_pod_serviceVersion)
+        - name: _samples_pod_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: _samples_pod_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: _samples_pod_hostIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: eureka.instance.metadataMap.mesh
+          value: "true"
+        - name: eureka.instance.metadataMap.tag
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+          value: 127.0.0.1
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+          value: "8771"
+        image: flomesh/samples-bookinfo-details:latest
+        name: app
+        ports:
+        - containerPort: 8103
+        resources: {}
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-config-service 8888; \
+            do echo "Waiting for config service ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-config
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-bookinfo-productpage
+    sidecar-injected: "true"
+  name: samples-bookinfo-productpage
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-bookinfo-productpage
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: samples-bookinfo-productpage
+        app.flomesh.io/port: "9080"
+      labels:
+        app: samples-bookinfo-productpage
+    spec:
+      containers:
+      - env:
+        - name: _samples_pod_ns
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: _samples_pod_nodeName
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: _samples_pod_name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: _samples_pod_serviceName
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _samples_pod_serviceVersion
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['version']
+        - name: _samples_pod_serviceFullName
+          value: $(_samples_pod_serviceName)-$(_samples_pod_serviceVersion)
+        - name: _samples_pod_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: _samples_pod_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: _samples_pod_hostIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: SERVICES_DOMAIN
+          value: springboot.svc
+        - name: K8S_SAMPLES_API_GATEWAY_HOSTNAME
+          value: samples-api-gateway
+        - name: K8S_SAMPLES_API_GATEWAY_PORT
+          value: "10010"
+        image: flomesh/samples-bookinfo-productpage:latest
+        name: app
+        ports:
+        - containerPort: 9080
+        resources: {}
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-api-gateway 10010; \
+            do echo "Waiting for API Gateway ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-gateway
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-bookinfo-ratings
+    app.flomesh.io/type: springboot
+    sidecar-injected: "true"
+  name: samples-bookinfo-ratings
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-bookinfo-ratings
+      app.flomesh.io/type: springboot
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: samples-bookinfo-ratings
+        app.flomesh.io/port: "8101"
+      labels:
+        app: samples-bookinfo-ratings
+        app.flomesh.io/type: springboot
+    spec:
+      containers:
+      - env:
+        - name: _samples_pod_ns
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: _samples_pod_nodeName
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: _samples_pod_name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: _samples_pod_serviceName
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _samples_pod_serviceVersion
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['version']
+        - name: _samples_pod_serviceFullName
+          value: $(_samples_pod_serviceName)-$(_samples_pod_serviceVersion)
+        - name: _samples_pod_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: _samples_pod_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: _samples_pod_hostIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: eureka.instance.metadataMap.mesh
+          value: "true"
+        - name: eureka.instance.metadataMap.tag
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+          value: 127.0.0.1
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+          value: "8771"
+        image: flomesh/samples-bookinfo-ratings:latest
+        name: app
+        ports:
+        - containerPort: 8101
+        resources: {}
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-config-service 8888; \
+            do echo "Waiting for config service ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-config
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-bookinfo-reviews
+    sidecar-injected: "true"
+    version: v1
+  name: samples-bookinfo-reviews-v1
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-bookinfo-reviews
+      version: v1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: samples-bookinfo-reviews
+        app.flomesh.io/port: "8102"
+      labels:
+        app: samples-bookinfo-reviews
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: _samples_pod_ns
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: _samples_pod_nodeName
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: _samples_pod_name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: _samples_pod_serviceName
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _samples_pod_serviceVersion
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['version']
+        - name: _samples_pod_serviceFullName
+          value: $(_samples_pod_serviceName)-$(_samples_pod_serviceVersion)
+        - name: _samples_pod_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: _samples_pod_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: _samples_pod_hostIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: eureka.instance.metadataMap.mesh
+          value: "true"
+        - name: eureka.instance.metadataMap.tag
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+          value: 127.0.0.1
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+          value: "8771"
+        - name: RATINGS_ENABLED
+          value: "false"
+        image: flomesh/samples-bookinfo-reviews:latest
+        name: app
+        ports:
+        - containerPort: 8102
+        resources: {}
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-config-service 8888; \
+            do echo "Waiting for config service ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-config
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-bookinfo-reviews
+    sidecar-injected: "true"
+    version: v2
+  name: samples-bookinfo-reviews-v2
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-bookinfo-reviews
+      version: v2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: samples-bookinfo-reviews
+        app.flomesh.io/port: "8102"
+      labels:
+        app: samples-bookinfo-reviews
+        version: v2
+    spec:
+      containers:
+      - env:
+        - name: _samples_pod_ns
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: _samples_pod_nodeName
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: _samples_pod_name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: _samples_pod_serviceName
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _samples_pod_serviceVersion
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['version']
+        - name: _samples_pod_serviceFullName
+          value: $(_samples_pod_serviceName)-$(_samples_pod_serviceVersion)
+        - name: _samples_pod_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: _samples_pod_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: _samples_pod_hostIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: eureka.instance.metadataMap.mesh
+          value: "true"
+        - name: eureka.instance.metadataMap.tag
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+          value: 127.0.0.1
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+          value: "8771"
+        - name: RATINGS_ENABLED
+          value: "true"
+        image: flomesh/samples-bookinfo-reviews:latest
+        name: app
+        ports:
+        - containerPort: 8102
+        resources: {}
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        env:
+        - name: TARGET_PORT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/port']
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: DISCOVERY_SERVICE
+          value: samples-discovery-server:8761
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-263
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-config-service 8888; \
+            do echo "Waiting for config service ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-config
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-config-service
+    app.flomesh.io/type: springboot
+    sidecar-injected: "true"
+  name: samples-config-service
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-config-service
+      app.flomesh.io/type: springboot
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: samples-config-service
+        app.flomesh.io/type: springboot
+    spec:
+      containers:
+      - env:
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+          value: samples-discovery-server
+        - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+          value: "8761"
+        - name: K8S_SAMPLES_BOOKINFO_RATINGS_HOSTNAME
+          value: samples-bookinfo-ratings
+        - name: K8S_SERVICE_NAME
+          value: samples-config-service
+        image: flomesh/samples-config-service:latest
+        name: app
+        ports:
+        - containerPort: 8888
+        resources: {}
+      initContainers:
+      - args:
+        - |-
+          until nc -vz samples-discovery-server 8761; \
+            do echo "Waiting for Discovery Service ready ..."; \
+            sleep 5; \
+          done;
+        command:
+        - /bin/sh
+        - -c
+        image: busybox:latest
+        name: check-discovery
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: samples-discovery-server
+    app.flomesh.io/type: springboot
+  name: samples-discovery-server
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samples-discovery-server
+      app.flomesh.io/type: springboot
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: samples-discovery-server
+        app.flomesh.io/type: springboot
+    spec:
+      containers:
+      - env:
+        - name: eureka.server.enableSelfPreservation
+          value: "false"
+        image: flomesh/samples-discovery-server:latest
+        name: app
+        ports:
+        - containerPort: 8761
+        resources: {}
+status: {}

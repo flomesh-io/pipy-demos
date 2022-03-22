@@ -1,0 +1,10 @@
+{
+  "services": {
+    "samples-bookinfo-ratings": {
+      "white": [],
+      "black": [
+        "samples-api-gateway"
+      ]
+    }
+  }
+}

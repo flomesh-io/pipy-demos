@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:    
+        - name: app
+          env:
+            - name: SAMPLES_ZK_HOSTNAME
+              value: 'zookeeper'
+            - name: SAMPLES_ZK_PORT
+              value: '2181' 

@@ -1,0 +1,16 @@
+{
+  "inboundPlugins": [
+    "plugins/inbound/ban.js",
+    "plugins/inbound/circuit-breaker.js",
+    "plugins/inbound/throttle.js",
+    "plugins/logger.js",
+    "plugins/inbound/inbound.js"
+  ],
+  "outboundPlugins": [
+    "plugins/header-injection.js",
+    "plugins/router.js",
+    "plugins/logger.js",
+    "plugins/balancer.js",
+    "plugins/default.js"
+  ]
+}

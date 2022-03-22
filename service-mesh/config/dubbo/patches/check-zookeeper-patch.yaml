@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+  labels:
+    sidecar-injected: true
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: init
+          image: flomesh/wait-for-it:1.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+          - bash
+          - -c
+          - |+
+            /wait-for-it.sh --strict --timeout=0 \
+              --host=zookeeper.dubbo.svc \
+              --port=2181 \
+              -- echo "SERVICE IS READY!"

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+  labels:
+    sidecar-injected: true
+spec:
+  template:
+    spec:
+      hostAliases:
+        - ip: "127.0.0.1"            
+          hostnames:
+            - reviews
+            - details
+            - ratings    
+      containers:
+        - image: flomesh/pipy-pjs:0.4.0-263
+          name: sidecar
+          command:
+            - /usr/local/bin/pipy
+            - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+          env:
+            - name: TARGET_PORT
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations['app.flomesh.io/port']
+            - name: SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations['app.flomesh.io/name']
+            - name: DISCOVERY_SERVICE
+              value: samples-discovery-server:8761
+

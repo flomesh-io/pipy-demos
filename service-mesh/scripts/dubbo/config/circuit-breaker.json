@@ -1,0 +1,17 @@
+{
+  "serviceIDs": {
+    "io.flomesh.demo.dubbo.api.DemoHelloService:sayHello(Ljava/lang/String;)": {
+      "enabled": false,
+      "response": {
+        "status": 20,
+        "code": 4,
+        "content":"V1-[hello-service] : Hello, world, Today is (2222-02-22), Time is (22:22:22.222)"
+      }
+    }
+  },
+  "response": {
+    "status": 70,
+    "code": 500,
+    "content": "Server Unavailable!"
+  }
+}

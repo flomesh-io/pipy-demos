@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+  labels:
+    sidecar-injected: true
+spec:
+  template:
+    spec:
+      containers:    
+        - name: app
+          env:
+            - name: _samples_pod_ns
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: _samples_pod_nodeName
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: _samples_pod_name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: _samples_pod_serviceName
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['app.flomesh.io/name']
+            - name: _samples_pod_serviceVersion
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['version']
+            - name: _samples_pod_serviceFullName
+              value: $(_samples_pod_serviceName)-$(_samples_pod_serviceVersion)
+            - name: _samples_pod_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: _samples_pod_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: _samples_pod_hostIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP          

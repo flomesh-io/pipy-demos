@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-service
+  name: hello-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      annotations:
+        "app.flomesh.io/name": "hello-service"
+      labels:
+        app: hello-service
+    spec:
+      containers:
+      - image: flomesh/samples-hello-svc:1.0.0-dubbo
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 20880
+        resources: {}
+status: {}

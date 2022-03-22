@@ -1,0 +1,7 @@
+{
+  "services": {
+    "productpage": {
+      "rateLimit": 1000
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "apps": {
+    "hello-service": {
+      "rateLimit": 10
+    }
+  }
+}

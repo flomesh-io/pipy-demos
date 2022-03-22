@@ -1,0 +1,13 @@
+{
+  "services": {
+    "samples-bookinfo-details": {
+      "enabled": false
+    }
+  },
+  "response": {
+    "head": {
+      "status": 503
+    },
+    "message": "service unavailable!"
+  }
+}

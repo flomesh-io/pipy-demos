@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxychains-cfg
+  namespace: flomesh-dubbo
+data:
+  proxychains.conf: |
+    strict_chain
+
+    # Some timeouts in milliseconds
+    tcp_read_time_out 15000
+    tcp_connect_time_out 8000
+
+    ## Exclude connections to ANYwhere with port 2181, 5672, 6379, 3306
+    localnet 0.0.0.0:2181/0.0.0.0
+    localnet 0.0.0.0:5672/0.0.0.0
+    localnet 0.0.0.0:6379/0.0.0.0
+    localnet 0.0.0.0:3306/0.0.0.0
+
+    ## RFC5735 Loopback address range
+    ## enable it if you want to use an application that connects to localhost.
+    localnet 127.0.0.0/255.0.0.0
+
+    [ProxyList]
+    socks4 	127.0.0.1 1080

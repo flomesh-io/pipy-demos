@@ -1,0 +1,17 @@
+{
+  "services": {
+    "productpage": ["productpage.bookinfo.svc.cluster.local:9080"],
+    "reviews": ["reviews.bookinfo.svc.cluster.local:9080"],
+    "details": ["details.bookinfo.svc.cluster.local:9080"],
+    "ratings": ["ratings.bookinfo.svc.cluster.local:9080"],
+    "productpage-v1": ["productpage-v1.bookinfo.svc.cluster.local:9080"],
+    "reviews-v1": ["reviews-v1.bookinfo.svc.cluster.local:9080"],
+    "details-v1": ["details-v1.bookinfo.svc.cluster.local:9080"],
+    "ratings-v1": ["ratings-v1.bookinfo.svc.cluster.local:9080"],
+    "productpage-v2": ["productpage-v2.bookinfo.svc.cluster.local:9080"],
+    "reviews-v2": ["reviews-v2.bookinfo.svc.cluster.local:9080"],
+    "details-v2": ["details-v2.bookinfo.svc.cluster.local:9080"],
+    "ratings-v2": ["ratings-v2.bookinfo.svc.cluster.local:9080"],
+    "reviews-v3": ["reviews-v3.bookinfo.svc.cluster.local:9080"]
+  }
+}

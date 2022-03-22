@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+  labels:
+    sidecar-injected: true
+spec:
+  template:
+    spec:
+      volumes:
+        - name: cache-volume
+          emptyDir: {}
+      containers:
+        - image: flomesh/pipy-pjs:0.4.0-263
+          name: sidecar
+          command:
+            - /usr/local/bin/pipy
+            - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+          volumeMounts:
+            - mountPath: /opt/data
+              name: cache-volume            
+          env:
+            - name: TARGET_PORT
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations['app.flomesh.io/port']
+            - name: SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations['app.flomesh.io/name']
+            - name: SERVICE_VERSION
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['version']
+            - name: DISCOVERY_SERVICE
+              value: samples-discovery-server:8761
+            - name: _pod_ns
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: _pod_nodeName
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: _pod_name
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: _pod_serviceName
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations['app.flomesh.io/name']
+            - name: _pod_UID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.uid
+            - name: _pod_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: _pod_hostIP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          # lifecycle:
+          #   preStop:
+          #     exec:
+          #       command:
+          #       - "sh"
+          #       - "-c"
+          #       - |
+          #         sleep 5s
+        - name: app
+          env:
+            - name: eureka.instance.metadataMap.mesh
+              value: 'true'
+            - name: eureka.instance.metadataMap.tag
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['version']
+            - name: K8S_SAMPLES_DISCOVERY_SERVER_HOSTNAME
+              value: '127.0.0.1'
+            - name: K8S_SAMPLES_DISCOVERY_SERVER_PORT
+              value: "8771" 
+                 

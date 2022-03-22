@@ -1,0 +1,46 @@
+{
+  "services": {
+    "reviews": {
+      "http": [
+        {
+          "matches": [
+            {
+              "type": "header",
+              "name": "user-agent",
+              "reg": ".*Chrome.*"
+            }
+          ],
+          "routes": [
+            {
+              "service": "reviews-v3",
+              "weight": 100
+            }
+          ]
+        },
+        {
+          "matches": [
+            {
+              "type": "header",
+              "name": "user-agent",
+              "reg": ".*Firefox.*"
+            }
+          ],
+          "routes": [
+            {
+              "service": "reviews-v2",
+              "weight": 100
+            }
+          ]
+        },
+        {
+          "routes": [
+            {
+              "service": "reviews-v1",
+              "weight": 100
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

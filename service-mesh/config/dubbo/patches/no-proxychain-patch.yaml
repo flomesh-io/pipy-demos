@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:    
+        - name: app
+          command:
+          - sh
+          - -c
+          - |-
+            java -jar app.jar

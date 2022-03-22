@@ -1,0 +1,52 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  version: 'v1'
+nameSuffix: '-v1'
+resources:
+  - ../resources/samples-bookinfo-reviews.yaml
+
+patches:
+  - path: ../patches/check-configservice-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/sidecar-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/opentelemetry-patch.yaml
+    target:
+      kind: Deployment
+  - patch: |-
+      - op: add
+        path: /spec/selector/matchLabels/version
+        value: v1
+      - op: add
+        path: /spec/template/metadata/labels/version
+        value: v1
+    target:
+      kind: Deployment
+  - patch: |-
+      - op: add
+        path: /spec/selector/version
+        value: v1
+      - op: add
+        path: /metadata/labels/version
+        value: v1
+    target:
+      kind: Service
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: samples-bookinfo-reviews
+    spec:
+      template:
+        spec:
+          containers:
+            - name: app
+              env:
+                - name: RATINGS_ENABLED
+                  value: 'false'

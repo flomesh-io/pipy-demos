@@ -1,0 +1,31 @@
+{
+  "services": {
+    "samples-bookinfo-reviews": {
+      "http": [
+        {
+          "matches": [
+            {
+              "type": "header",
+              "name": "user-agent",
+              "reg": ".*(Firefox|Chrome).*"
+            }
+          ],
+          "routes": [
+            {
+              "service": "samples-bookinfo-reviews-v2",
+              "weight": 100
+            }
+          ]
+        },
+        {
+          "routes": [
+            {
+              "service": "samples-bookinfo-reviews-v1",
+              "weight": 100
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

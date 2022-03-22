@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pipy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipy-repo
+  namespace: pipy
+spec:
+  ports:
+  - nodePort: 30060
+    port: 6060
+    protocol: TCP
+    targetPort: 6060
+  selector:
+    control-plane: pipy-repo
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    control-plane: pipy-repo
+  name: pipy-repo
+  namespace: pipy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: pipy-repo
+  template:
+    metadata:
+      labels:
+        control-plane: pipy-repo
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - |
+          /usr/local/bin/pipy --admin-port=6060
+        image: flomesh/pipy-pjs:0.4.0-328
+        name: repo
+        ports:
+        - containerPort: 6060
+          name: repo
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 20M

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:    
+        - name: app
+          # imagePullPolicy: Always
+          command:
+          - sh
+          - -c
+          - |-
+            proxychains4 -f /proxychains/proxychains.conf \
+              java -javaagent:/opentelemetry-javaagent.jar \
+              -Dotel.traces.exporter=logging \
+              -Dotel.metrics.exporter=none \
+              -Dotel.propagators=tracecontext,baggage,b3multi \
+              -Dotel.resource.attributes="service.name=${SERVICE_NAME}" \
+              -Dotel.javaagent.debug=false \
+              -Djava.security.egd=file:/dev/./urandom \
+              -Xms512m -Xmx1024m \
+              -Djava.security.egd=file:/dev/./urandom \
+              -jar /app.jar
+          env:
+            - name: SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations['app.flomesh.io/name']                        
+          volumeMounts:
+            - name: proxy-cfg
+              mountPath: /proxychains
+      volumes:
+        - name: proxy-cfg
+          configMap:
+            name: proxychains-cfg

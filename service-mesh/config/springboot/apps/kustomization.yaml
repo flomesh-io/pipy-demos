@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app.flomesh.io/type: springboot
+
+resources:
+- ../resources/samples-bookinfo-details.yaml
+- ../resources/samples-bookinfo-ratings.yaml
+
+patches:
+  - path: ../patches/check-configservice-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/sidecar-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/opentelemetry-patch.yaml
+    target:
+      kind: Deployment

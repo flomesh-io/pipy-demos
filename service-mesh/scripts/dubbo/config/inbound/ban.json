@@ -1,0 +1,8 @@
+{
+  "ifaces": {
+    "io.flomesh.demo.dubbo.api.DemoHelloService": {
+      "black": ["consumer-service-v2"],
+      "white": []
+    }
+  }
+}

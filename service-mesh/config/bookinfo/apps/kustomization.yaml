@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../resources/bookinfo-productpage.yaml
+  - ../resources/bookinfo-details.yaml
+  - ../resources/bookinfo-ratings.yaml
+
+images:
+  - name: flomesh/examples-bookinfo-productpage
+    newName: flomesh/examples-bookinfo-reviews-v1
+    newTag: latest
+  - name: flomesh/examples-bookinfo-details
+    newName: flomesh/examples-bookinfo-details-v1
+    newTag: latest
+  - name: flomesh/examples-bookinfo-ratings
+    newName: flomesh/examples-bookinfo-ratings-v1
+    newTag: latest  
+
+patches:
+  - path: ../patches/sidecar-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/deploy-patch.yaml
+    target:
+      kind: Deployment      
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/imagePullPolicy
+        value: Always  
+    target:
+      kind: Deployment  
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/ports/0/containerPort #container index is 1 after sidecar injected
+        value: 8080
+    target:
+      kind: Deployment
+  - patch: |-
+      - op: add
+        path: /spec/ports/0/targetPort
+        value: 8090
+    target:
+      kind: Service
+  # offect container port to invoid duplicating with the one outbount listening

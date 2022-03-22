@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+  labels:
+    sidecar-injected: true
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: check-gateway
+          image: busybox:latest
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - |-
+              until nc -vz samples-api-gateway 10010; \
+                do echo "Waiting for API Gateway ready ..."; \
+                sleep 5; \
+              done;

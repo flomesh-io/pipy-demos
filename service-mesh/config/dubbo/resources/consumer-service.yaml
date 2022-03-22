@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: consumer-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+  name: consumer-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30088
+  selector:
+    app: consumer-service
+    app.flomesh.io/type: dubbo
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: consumer-service
+  name: consumer-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      annotations:
+        "app.flomesh.io/name": "consumer-service"
+      labels:
+        app: consumer-service
+    spec:
+      containers:
+      - image: flomesh/samples-consumer-svc:1.0.0-dubbo
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 20880
+        resources: {}
+status: {}

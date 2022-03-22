@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: date-service
+  name: date-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: date-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      annotations:
+        "app.flomesh.io/name": "date-service"
+      labels:
+        app: date-service
+    spec:
+      containers:
+      - image: flomesh/samples-date-svc:1.0.0-dubbo
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 20880
+        resources: {}
+status: {}
