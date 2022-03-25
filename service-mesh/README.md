@@ -30,7 +30,7 @@ Table of Content:
 
 ### 1.1. Setup Clickhouse
 
-Execute `docker-compose -f clickhouse.yaml -d` to run a clickhouse server.
+Execute `docker-compose -f clickhouse.yaml up -d` to run a clickhouse server.
 
 ```yaml
 #clickhouse.yaml
