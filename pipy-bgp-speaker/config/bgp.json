@@ -1,0 +1,11 @@
+{
+  "bgp_addr": "192.168.1.31:179",
+  "my_asn": 65001,
+  "hold_time": 180,
+  "bgp_id": "192.168.1.33",
+  "withdraw_routes": [],
+  "origin": 2,
+  "as_path": [65001],
+  "nexthop": "192.168.1.33",
+  "prefixes": ["192.168.0.100/32"]
+}
