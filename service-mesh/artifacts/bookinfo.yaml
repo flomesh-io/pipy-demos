@@ -143,6 +143,46 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
         - name: DISCOVERY_SERVICE
           value: samples-discovery-server:8761
         image: flomesh/pipy-pjs:0.4.0-263
@@ -195,6 +235,46 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
         - name: DISCOVERY_SERVICE
           value: samples-discovery-server:8761
         image: flomesh/pipy-pjs:0.4.0-263
@@ -253,6 +333,46 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
         - name: DISCOVERY_SERVICE
           value: samples-discovery-server:8761
         image: flomesh/pipy-pjs:0.4.0-263
@@ -308,6 +428,46 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
         - name: DISCOVERY_SERVICE
           value: samples-discovery-server:8761
         image: flomesh/pipy-pjs:0.4.0-263
@@ -376,6 +536,46 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
         - name: DISCOVERY_SERVICE
           value: samples-discovery-server:8761
         image: flomesh/pipy-pjs:0.4.0-263
@@ -444,6 +644,46 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SERVICE_VERSION
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['version']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
         - name: DISCOVERY_SERVICE
           value: samples-discovery-server:8761
         image: flomesh/pipy-pjs:0.4.0-263
