@@ -132,11 +132,11 @@ kubectl apply -f artifacts/dubbo.yaml
 
 **SpringBoot Bookinfo**
 
-![](docs/flomesh-poc-1.png)
+![](docs/flomesh-poc-2.png)
 
 **Istio Bookinfo**
 
-![](docs/flomesh-poc-2.png)
+![](docs/flomesh-poc-1.png)
 
 **Dubbo**
 
