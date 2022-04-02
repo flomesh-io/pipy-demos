@@ -11,10 +11,16 @@ Table of Content:
 * [3. Springboot/Bookinfo Operating](#3-springbootbookinfo-operating)
   * [3.1. Canary](#31-canary)
     * [3.1.1. SpringBoot](#311-springboot)
-    * [3.1.2. Istio bookinfo](#312-istio-bookinfo)
+    * [3.1.2. Bookinfo](#312-bookinfo)
   * [3.2. Rate Limit](#32-rate-limit)
+    * [3.2.1 SpringBoot](#321-springboot)
+    * [3.2.2 Bookinfo](#322-bookinfo)
   * [3.3. Circuit breaker](#33-circuit-breaker)
+    * [3.3.1 SpringBoot](#331-springboot)
+    * [3.3.2 Bookinfo](#332-bookinfo)
   * [3.4. Black/White List & ACL](#34-blackwhite-list--acl)
+    * [3.4.1 SpringBoot](#341-springboot)
+    * [3.4.2 Bookinfo](#342-bookinfo)
 * [4. Dubbo Operating](#4-dubbo-operating)
   * [4.1. Rate Limit](#41-rate-limit)
   * [4.2. Cricuit Breaker](#42-cricuit-breaker)
@@ -149,7 +155,7 @@ Currently, match supports `header`, `method` and `path`. All of them supports re
 
 Config: [router.json](scripts/springboot/config/router.json)
 
-#### 3.1.2. Istio bookinfo
+#### 3.1.2. Bookinfo
 
 * Firefox: show blacking rating
 * Chrome: show red rating
@@ -161,8 +167,9 @@ Config: [router.json](scripts/bookinfo/config/router.json)
 
 Implemented in service provider side.
 
+#### 3.2.1 SpringBoot
+
 * SpringBoot Config: [throttle.json](scripts/springboot/config/inbound/throttle.json)
-* Bookinfo Config: [throttle.json](scripts/bookinfo/config/inbound/throttle.json)
 
 Sample: 
 
@@ -178,12 +185,30 @@ Sample:
 
 Access review service via gateway and we use *wrk* to simulate requests, `wrk -c5 -t5 -d10s --latency http://localhost:30010/bookinfo-reviews/reviews/2099a055-1e21-46ef-825e-9e0de93554ea`.
 
+#### 3.2.2 Bookinfo
+
+* Bookinfo Config: [throttle.json](scripts/bookinfo/config/inbound/throttle.json)
+
+```json
+{
+  "services": {
+    "productpage": {
+      "rateLimit": 30
+    }
+  }
+}
+```
+
+After change rate limit of product page to `30`, let's generate load with wrk by executing command `/wrk -c100 -t1 -d10 http://localhost:30088/productpage?u=normal`. Now you will get the RPS round 30.
+
 ### 3.3. Circuit breaker
 
 Implemented in service provider side.
 
+#### 3.3.1 SpringBoot
+
 * SpringBoot Config: [circuit-breaker.json](scripts/springboot/config/inbound/circuit-breaker.json)
-* Bookinfo Config: [circuit-breaker.json](scripts/springboot/config/inbound/circuit-breaker.json)
+
 
 ```json
 {
@@ -203,12 +228,35 @@ Implemented in service provider side.
 
 Update `enabled` to `false` and execute `curl -is http://localhost:30010/bookinfo-details/details/2099a055-1e21-46ef-825e-9e0de93554ea`. You will get 503 response.
 
+#### 3.3.2 Bookinfo
+
+* Bookinfo Config: [circuit-breaker.json](scripts/springboot/config/inbound/circuit-breaker.json)
+
+```json
+{
+  "services": {
+    "productpage": {
+      "enabled": true
+    }
+  },
+  "response": {
+    "head": {
+      "status": 503
+    },
+    "message": "service unavailable!"
+  }
+}
+```
+
+Now we can enable the circuit breaker by set `enabled` to `true`. Then you will get *service unavailable!* on page after page refreshed.
+
 ### 3.4. Black/White List & ACL
 
 Implemented in service provider side.
 
+#### 3.4.1 SpringBoot
+
 * SpringBoot Config: [ban.json](scripts/springboot/config/inbound/ban.json)
-* Bookinfo Config: [ban.json](scripts/bookinfo/config/inbound/ban.json)
 
 ```json
 {
@@ -226,6 +274,23 @@ Implemented in service provider side.
 With config above, you should get 403 forbidden response if attempting to execute `curl -i http://localhost:30010/bookinfo-ratings/ratings/2099a055-1e21-46ef-825e-9e0de93554ea`.
 
 Once remove `samples-api-gateway` from blacklist, will get 200 response with correct rating data.
+
+#### 3.4.2 Bookinfo
+
+* Bookinfo Config: [ban.json](scripts/bookinfo/config/inbound/ban.json)
+
+```json
+{
+  "services": {
+    "reviews": {
+      "white": [],
+      "black": ["productpage"]
+    }
+  }
+}
+```
+
+One inject *productpage* to black list of *reviews*, you will get *Sorry, product reviews are currently unavailable for this book.* on page, cause the access of *productpage* is denied by *reviews*.
 
 ## 4. Dubbo Operating
 
