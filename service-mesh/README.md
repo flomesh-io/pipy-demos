@@ -199,7 +199,7 @@ Access review service via gateway and we use *wrk* to simulate requests, `wrk -c
 }
 ```
 
-After change rate limit of product page to `30`, let's generate load with wrk by executing command `/wrk -c100 -t1 -d10 http://localhost:30088/productpage?u=normal`. Now you will get the RPS round 30.
+After change rate limit of product page to `30`, let's generate load with wrk by executing command `wrk -c100 -t1 -d10 http://localhost:30088/productpage?u=normal`. Now you will get the RPS round 30.
 
 ### 3.3. Circuit breaker
 
