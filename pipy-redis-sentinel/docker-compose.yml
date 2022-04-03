@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  pipy:
+    image: naqvis/pipy:0.30.0-23
+    container_name: pipy-proxy
+    volumes:
+      - ./pipy:/proxy:ro
+    environment:
+      - PIPY_CONFIG_FILE=/proxy/proxy.js
+    ports:
+      - 6379:6379
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+
+  redis-master:
+    image: redis:alpine
+    container_name: redis-master
+
+  redis-slave1:
+    image: redis:alpine
+    command: redis-server --slaveof redis-master 6379
+    container_name: redis-slave1
+    depends_on:
+      - redis-master
+
+  redis-slave2:
+    image: redis:alpine
+    command: redis-server --slaveof redis-master 6379
+    container_name: redis-slave2
+    depends_on:
+      - redis-master
+
+  sentinel:
+    build: sentinel
+    image: sentinel
+    environment:
+      - SENTINEL_QUORUM=2
+      - SENTINEL_DOWN_AFTER=5000
+      - SENTINEL_FAILOVER=5000
+    deploy:
+      replicas: 3
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2

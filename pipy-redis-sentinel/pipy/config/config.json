@@ -1,0 +1,12 @@
+{
+    "port" : 6379,
+    "servers" : ["redis-master:6379", "redis-slave1:6379", "redis-slave2:6379"],
+    "connectTimeout" : "1s",
+    "readTimeout" : "1s",
+    "master_only_commands" : ["set"],
+    "healthcheck" : {
+        "interval" : "5s",
+        "connectTimeout" : "1s",
+        "readTimeout" : "1s"
+    }
+}
