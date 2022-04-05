@@ -1,0 +1,7 @@
+{
+  "host": "samples-discovery-server:8761",
+  "client": {
+    "heartbeatInterval": "5s",
+    "healthcheckInterval": "2s"
+  }
+}

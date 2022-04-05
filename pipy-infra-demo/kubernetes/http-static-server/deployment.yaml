@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipy-http-static-server
+spec:
+  selector:
+    matchLabels:
+      app: pipy-http-static-server
+      infra.flomesh.io/registry: 'true'
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pipy-http-static-server
+        infra.flomesh.io/registry: 'true'
+    spec:
+      shareProcessNamespace: true
+      containers:
+      - name: pipy-http-static-server
+        image: flomesh/pipy-pjs:0.4.0-211
+        command: ["pipy"]
+        args: ["/etc/pipy/test/015-http-static-server/pipy.js"]
+        env:
+        - name: spring.application.name
+          value: 'pipy-http-static-server'         
+        ports:
+        - containerPort: 6080
+        resources: {} 
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 2
+          successThreshold: 1
+          failureThreshold: 30
+          httpGet:
+            port: 6080
+            path: /index.html
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - "sh"
+              - "-c"
+              - |
+                wget 127.0.0.1:8762 && sleep 5s            

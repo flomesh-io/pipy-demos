@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pipy-http-static-server
+    infra.flomesh.io/registry: 'true'
+  name: pipy-http-static-server
+spec:
+  containers:
+  - image: flomesh/pipy-pjs:0.4.0-211
+    name: pipy-http-static-server
+    env:
+    - name: spring.application.name
+      value: 'pipy-http-static-server'  
+    command: ["pipy"]
+    args: ["/etc/pipy/test/015-http-static-server/pipy.js"]
+    ports:
+    - containerPort: 6080
+    resources: {} 
+    readinessProbe:
+      initialDelaySeconds: 20
+      periodSeconds: 2
+      successThreshold: 1
+      failureThreshold: 30
+      httpGet:
+        port: 6080
+        path: /index.html
+    lifecycle:
+      preStop:
+        exec:
+          command:
+          - "sh"
+          - "-c"
+          - |
+            wget 127.0.0.1:8762 && sleep 5s        
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+

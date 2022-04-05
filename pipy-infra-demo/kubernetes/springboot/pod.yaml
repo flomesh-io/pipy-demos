@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: samples-bookinfo-ratings
+    infra.flomesh.io/registry: 'true'
+  name: samples-bookinfo-ratings
+spec:
+  containers:
+  - image: flomesh/samples-bookinfo-ratings:latest
+    name: samples-bookinfo-ratings
+    env:
+    - name: eureka.client.enabled
+      value: 'false'
+    - name: spring.cloud.config.discovery.enabled
+      value: 'false'
+    - name: spring.cloud.config.uri
+      value: 'http://samples-config-service:8888'
+    - name: spring.application.name
+      value: 'bookinfo-ratings'    
+    ports:
+    - containerPort: 8101
+    resources: {}   
+    readinessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 2
+      successThreshold: 1
+      failureThreshold: 30
+      httpGet:
+        port: 8101
+        path: /actuator/health
+    lifecycle:
+      preStop:
+        exec:
+          command:
+          - "sh"
+          - "-c"
+          - |
+            wget 127.0.0.1:8762 && sleep 5s
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

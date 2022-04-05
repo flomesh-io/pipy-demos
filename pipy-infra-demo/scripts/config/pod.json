@@ -1,0 +1,195 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":null,\"labels\":{\"infra.flomesh.io/registry\":\"true\",\"run\":\"pipy-http-static-server\"},\"name\":\"pipy-http-static-server\",\"namespace\":\"default\"},\"spec\":{\"containers\":[{\"args\":[\"/etc/pipy/test/015-http-static-server/pipy.js\"],\"command\":[\"pipy\"],\"env\":[{\"name\":\"spring.application.name\",\"value\":\"pipy-http-static-server\"}],\"image\":\"flomesh/pipy-pjs:0.4.0-211\",\"name\":\"pipy-http-static-server\",\"ports\":[{\"containerPort\":6080}],\"readinessProbe\":{\"failureThreshold\":30,\"httpGet\":{\"path\":\"/index.html\",\"port\":6080},\"initialDelaySeconds\":5,\"periodSeconds\":2,\"successThreshold\":1},\"resources\":{}}],\"dnsPolicy\":\"ClusterFirst\",\"restartPolicy\":\"Always\"},\"status\":{}}\n"
+        },
+        "creationTimestamp": "2021-11-19T04:23:36Z",
+        "labels": {
+            "infra.flomesh.io/registry": "true",
+            "run": "pipy-http-static-server"
+        },
+        "name": "pipy-http-static-server",
+        "namespace": "default",
+        "resourceVersion": "4151",
+        "uid": "4b6e0dc1-59e3-4fa0-a034-3153ba1c1f93"
+    },
+    "spec": {
+        "containers": [
+            {
+                "args": [
+                    "/etc/pipy/test/015-http-static-server/pipy.js"
+                ],
+                "command": [
+                    "pipy"
+                ],
+                "env": [
+                    {
+                        "name": "spring.application.name",
+                        "value": "pipy-http-static-server"
+                    }
+                ],
+                "image": "flomesh/pipy-pjs:0.4.0-211",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "pipy-http-static-server",
+                "ports": [
+                    {
+                        "containerPort": 6080,
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "failureThreshold": 30,
+                    "httpGet": {
+                        "path": "/index.html",
+                        "port": 6080,
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 2,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 1
+                },
+                "resources": {},
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "kube-api-access-mqs7g",
+                        "readOnly": true
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "nodeName": "ch-demo-hk",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 30,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "kube-api-access-mqs7g",
+                "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ],
+                                "name": "kube-root-ca.crt"
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        },
+                                        "path": "namespace"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2021-11-19T04:23:36Z",
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2021-11-19T04:24:22Z",
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2021-11-19T04:24:22Z",
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2021-11-19T04:23:36Z",
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "containerID": "docker://4a36bbe1d45dfe424e7211b75a5eea634e197893b24861a17839254e8d3876c9",
+                "image": "flomesh/pipy-pjs:0.4.0-211",
+                "imageID": "docker-pullable://flomesh/pipy-pjs@sha256:6bc11cf1c4d0f31145e45bd1d854010621ce14b817e2a30f43cbb0f754d2b60f",
+                "lastState": {
+                    "terminated": {
+                        "containerID": "docker://1f953d5c20c42ce8e00cf0029d91218493baa9d13a0af16f61cce9c52182b6b2",
+                        "exitCode": 137,
+                        "finishedAt": "2021-11-19T04:24:16Z",
+                        "reason": "Error",
+                        "startedAt": "2021-11-19T04:23:37Z"
+                    }
+                },
+                "name": "pipy-http-static-server",
+                "ready": true,
+                "restartCount": 1,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2021-11-19T04:24:17Z"
+                    }
+                }
+            }
+        ],
+        "hostIP": "10.0.8.14",
+        "phase": "Running",
+        "podIP": "10.42.0.18",
+        "podIPs": [
+            {
+                "ip": "10.42.0.18"
+            }
+        ],
+        "qosClass": "BestEffort",
+        "startTime": "2021-11-19T04:23:36Z"
+    }
+}
