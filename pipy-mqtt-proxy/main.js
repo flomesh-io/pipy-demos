@@ -8,7 +8,7 @@ pipy({
 .listen(1884)
   .decodeMQTT()
   .demux('request')
-  .use('plugins/forward.js', 'request')
+  .use('plugins/balancer.js', 'request')
   .encodeMQTT()
 
 .pipeline('request')
