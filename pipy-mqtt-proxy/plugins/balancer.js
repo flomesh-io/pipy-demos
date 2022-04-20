@@ -1,16 +1,19 @@
 (config =>
 pipy({
   _protocolLevel: 4,
-  _target: null,
   _balancer: new algo.LeastWorkLoadBalancer(config.brokers),
+})
+
+.export('balancer', {
+  __target: null,
 })
 
 .pipeline('request')
   .handleStreamStart(
-    () => _target = _balancer.select()
+    () => __target = _balancer.select()
   )
   .handleStreamEnd(
-    () => _balancer.deselect(_target)
+    () => _balancer.deselect(__target)
   )
   .handleMessageStart(
     msg => (
@@ -20,8 +23,8 @@ pipy({
     )
   )
   .encodeMQTT()
-  .connect(() => _target)
+  .connect(() => __target)
   .decodeMQTT({
     protocolLevel: () => _protocolLevel,
   })
-)(JSON.decode(pipy.load('config/balancer.json')))
+)(JSON.decode(pipy.load('config/balancer.json')))  
