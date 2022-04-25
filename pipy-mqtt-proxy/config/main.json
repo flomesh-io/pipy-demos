@@ -1,8 +1,10 @@
 {
   "broker": "192.168.1.13:1883",
   "plugins": [
-    "plugins/throttle.js",
+    "plugins/logger.js",
     "plugins/metrics.js",
-    "plugins/logger.js"  
+    "plugins/identify.js",
+    "plugins/credential.js",
+    "plugins/throttle.js"
   ]
 }
