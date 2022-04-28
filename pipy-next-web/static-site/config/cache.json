@@ -1,0 +1,17 @@
+{
+  "services": {
+    "site-1": [
+      ".js",
+      ".css",
+      ".png",
+      ".jpg",
+      ".svg",
+      ".txt",
+      ".ico",
+      ".json",
+      ".map",
+      ".html"
+    ]
+  },
+  "timeout": 10000
+}

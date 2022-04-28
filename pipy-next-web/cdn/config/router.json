@@ -1,0 +1,10 @@
+{
+  "routes": {
+    "localhost/*": {
+      "service": "localhost"
+    },
+    "*.localhost/*": {
+      "service": "localhost"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "listen": 20081,
+  "listenTLS": 20444,
+  "maxConnections": -1,
+  "plugins": [
+    "plugins/router.js",
+    "plugins/cache.js",
+    "plugins/balancer.js"
+  ]
+}

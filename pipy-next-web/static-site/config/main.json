@@ -1,0 +1,13 @@
+{
+  "listen": 20080,
+  "listenTLS": 20443,
+  "maxConnections": -1,
+  "plugins": [
+    "plugins/router.js",
+    "plugins/logger.js",
+    "plugins/etag.js",
+    "plugins/cache.js",
+    "plugins/header-injector.js",
+    "plugins/static-server.js"
+  ]
+}

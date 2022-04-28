@@ -1,0 +1,17 @@
+{
+  "services": {
+    "localhost": [
+      ".js",
+      ".css",
+      ".png",
+      ".jpg",
+      ".svg",
+      ".txt",
+      ".ico",
+      ".json",
+      ".map",
+      ".html"
+    ]
+  },
+  "timeout": 10000
+}
