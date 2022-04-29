@@ -1,7 +1,7 @@
 {
   "services": {
     "localhost": {
-      "root": "./www"
+      "root": "./public"
     }
   }
 }
