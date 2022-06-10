@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  pipy:
+    image: naqvis/pipy
+    hostname: gateway
+    volumes:
+      - "./pipy:/pipy-mqtt:ro"
+    command: ["pipy", "--admin-port=6060", "/pipy-mqtt/proxy.js"]
+    depends_on:
+      - mosquitto
+    ports:
+      - "1883:1883"
+      - "6060:6060"
+
+  mosquitto:
+    image: eclipse-mosquitto
+    hostname: mosquitto
+    volumes:
+      - "./mosquitto:/mosquitto/config:ro"

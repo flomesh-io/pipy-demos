@@ -1,0 +1,10 @@
+{
+    "listen": 1883,
+    "broker": "mosquitto:1883",
+    "plugins": [
+        "plugins/log-metrics.js",
+        "plugins/connect.js",
+        "plugins/publish.js",
+        "plugins/subscribe.js"
+    ]
+}

@@ -1,0 +1,30 @@
+{
+        "CONNECT" : {
+            "clients" : {
+                "client1" : {
+                    "user" : "test1",
+                    "password" : "pass1"
+                },
+                "client2" : {
+                    "user" : "test2",
+                    "password" : "pass2"
+                },
+                "client3": {
+                    "user" : "test3",
+                    "password" : "pass3"
+                },
+                "client4": {
+                    "user" : "test4",
+                    "password" : "pass4"
+                }
+            }
+        },
+        "PUBLISH" : {
+            "client3" : ["service/*/topic"],
+            "client1"  : ["pipy/*", "service/*/topic"]
+        },
+        "SUBSCRIBE": {
+            "client2": ["pipy/*"],
+            "client1" : ["pipy/*","#", "$SYS/#"]
+        }
+}
