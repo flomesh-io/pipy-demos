@@ -32,32 +32,29 @@
           __client = policy.CONNECT.clients[__clientID])
           )
       )
-      .input(out => _output = out).to(p => p
-          .demux().to(p => p
-            .use(config.plugins, 'request')
-            .link(
-              'deny', () => __reject,
-              'proxy'
+      .input(out => _output = out).to($ => $
+        .demux().to($ => $
+          .use(config.plugins, 'request')
+          .branch(
+            () => __reject
+            , $ => $
+              .output(() => _output),
+            () => true, $ => $
+            .mux().to($ => $
+              .encodeMQTT()
+              .connect(() => config.broker)
+              .decodeMQTT({
+                protocolLevel : 5
+              })
+              .output(() => _output)
             )
+            .replaceMessage(new StreamEnd)
           )
-          .output()
+        )
+        .output()
       )
       .use(["plugins/log-metrics.js"],'request')
       .encodeMQTT()
-
-    .pipeline('deny')
-      .output(() => _output)
-
-    .pipeline('proxy')
-      .mux().to(p => p
-        .encodeMQTT()
-        .connect(() => config.broker)
-        .decodeMQTT({
-          protocolLevel : 5
-        })
-        .output(() => _output)
-      )
-      .replaceMessage(new StreamEnd)
 
     .task()
       .handleStreamStart(
