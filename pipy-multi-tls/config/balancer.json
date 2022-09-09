@@ -1,0 +1,10 @@
+{
+  "services": {
+    "hello.com": [
+      "localhost:8081"
+    ],
+    "hello.io": [
+      "localhost:8082"
+    ]
+  }
+}

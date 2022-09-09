@@ -1,0 +1,8 @@
+{
+  "routes": {
+    "hello.com/*": "hello.com",
+    "*.hello.com/*": "hello.com",
+    "hello.io/*": "hello.io",
+    "*.hello.io/*": "hello.io"
+  }
+}
