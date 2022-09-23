@@ -1,0 +1,16 @@
+{
+  "ipv6": false,
+  "asn4": false,
+  "afi_safi": [[1, 1]],
+  "bgp_addr": "192.168.52.147:179",
+  "my_asn": 7675,
+  "hold_time": 180,
+  "bgp_id": "192.168.52.148",
+  "withdrawn_routes": [],
+  "origin": 0,
+  "as_path": [
+    [2, [7675]]
+  ],
+  "nexthop": "192.168.52.148",
+  "prefixes": ["2.2.2.0/30"]
+}
