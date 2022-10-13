@@ -1,10 +1,7 @@
 ((
   config = pipy.solve('config.js'),
 ) =>
-  pipy({
-    _target: undefined,
-    _borrower: undefined,
-  })
+  pipy()
 
     .export('main', {
       __service: undefined,

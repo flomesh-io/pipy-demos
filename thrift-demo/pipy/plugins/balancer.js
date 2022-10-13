@@ -16,10 +16,7 @@
     __service: 'main',
   })
   .pipeline()
-  .onStart(() => (
-    _borrower = {},
-    null
-  ))
+  .onStart(() => void(_borrower = {}))
   .handleMessageStart(
     () => (
       _target = services[__service]?.next?.(_borrower),
@@ -29,8 +26,8 @@
   .branch(
     () => Boolean(_target), (
     $ => $
-      .encodeThrift()
       .muxQueue(() => _target).to($ => $
+        .encodeThrift()
         .connect(() => _target.id)
         .decodeThrift({ payload: true })
       )

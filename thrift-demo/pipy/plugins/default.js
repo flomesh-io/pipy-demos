@@ -1,3 +1,0 @@
-pipy()
-
-.pipeline()

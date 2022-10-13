@@ -3,8 +3,7 @@
   "plugins": [
     "plugins/router.js",
     "plugins/throttle.js",
-    "plugins/balancer.js",
-    "plugins/default.js"
+    "plugins/balancer.js"
   ],
   "routes": {
     "127.0.0.1_8000": "hello-server"
