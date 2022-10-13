@@ -24,12 +24,10 @@
   )
   .branch(
     () => Boolean(_quota), ($ => $
-      .muxQueue({}, { maxQueue: 0 }).to($ => $
-        .throttleMessageRate(
-          () => _quota
-        )
-        .demuxQueue().to($ => $.chain())
+      .throttleMessageRate(
+        () => _quota
       )
+      .chain()
   ),
     $ => $.chain()
   )
