@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-server
+  namespace: samples
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-server
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-server-v1
+  namespace: samples
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-server
+    version: v1
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-server-v2
+  namespace: samples
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-server
+    version: v2
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-server-v1
+  namespace: samples
+  labels:
+    app: hello-server
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-server
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: hello-server
+        version: v1
+    spec:
+      containers:
+        - name: hello-server
+          image: addozhang/thrift-hello-server
+          ports:
+            - containerPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-server-v2
+  namespace: samples
+  labels:
+    app: hello-server
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-server
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: hello-server
+        version: v2
+    spec:
+      containers:
+        - name: hello-server
+          image: addozhang/thrift-hello-server
+          ports:
+            - containerPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-client
+  namespace: samples
+  labels:
+    app: hello-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-client
+  template:
+    metadata:
+      labels:
+        app: hello-client
+    spec:
+      containers:
+        - name: sidecar
+          image: flomesh/pipy:latest
+          command:
+            - /usr/local/bin/pipy
+            - http://pipy-repo.flomesh:6060/repo/thrift-demo/
+        - name: hello-client
+          image: addozhang/thrift-hello-client
+          env:
+            - name: TARGET_HOST
+              value: localhost
+            - name: TARGET_PORT
+              value: '8000'

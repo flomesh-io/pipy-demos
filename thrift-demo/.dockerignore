@@ -1,0 +1,5 @@
+docker/
+k8s/
+charts/
+work/
+.git/

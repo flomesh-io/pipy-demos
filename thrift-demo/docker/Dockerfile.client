@@ -1,0 +1,7 @@
+FROM openjdk:8-jre-slim
+COPY target/thrift-demo-1.0-SNAPSHOT.jar ./app.jar
+
+ENV TARGET_HOST hello-server
+ENV TARGET_PORT 9090
+
+ENTRYPOINT java -cp app.jar io.flomesh.HelloClient $TARGET_HOST $TARGET_PORT

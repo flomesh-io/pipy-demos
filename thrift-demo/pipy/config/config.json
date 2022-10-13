@@ -1,0 +1,24 @@
+{
+  "listen": 8000,
+  "plugins": [
+    "plugins/router.js",
+    "plugins/throttle.js",
+    "plugins/balancer.js",
+    "plugins/default.js"
+  ],
+  "routes": {
+    "127.0.0.1_8000": "hello-server"
+  },
+  "services": {
+    "hello-server": {
+      "hello-server-v1:9090": 100,
+      "hello-server-v2:9090": 400
+    }
+  },
+  "rateLimit": {
+    "hello-server": {
+      "rate": 1,
+      "window": "3s"
+    }
+  }
+}
