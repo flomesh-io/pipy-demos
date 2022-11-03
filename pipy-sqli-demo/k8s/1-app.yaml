@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vms
+spec:
+  selector:
+    matchLabels:
+      app: vms
+  template:
+    metadata:
+      labels:
+        app: vms
+    spec:
+      containers:
+        - name: vms
+          image: naqvis/mamashop
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vms
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30060
+  selector:
+    app: vms
+  type: NodePort

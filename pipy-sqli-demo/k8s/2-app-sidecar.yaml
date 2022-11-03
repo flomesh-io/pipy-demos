@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vms
+spec:
+  selector:
+    matchLabels:
+      app: vms
+  template:
+    metadata:
+      labels:
+        app: vms
+    spec:
+      containers:
+        - name: vms
+          image: naqvis/mamashop
+          ports:
+            - containerPort: 80
+        - name: pipy # <-- sidecar
+          image: naqvis/pipy-nmi
+          env:
+            - name: PIPY_CONFIG_FILE
+              value: /etc/pipy/nmi/nmi.js
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /etc/pipy/nmi
+              name: pipy-pjs
+      volumes:
+        - name: pipy-pjs
+          configMap:
+            name: sidecar
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vms
+spec:
+  ports:
+    - port: 80
+      targetPort: 8000 # <-- the traffic is routed to the proxy
+      nodePort: 30060
+  selector:
+    app: vms
+  type: NodePort
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sidecar
+data:
+  nmi.js: |-
+    pipy({
+      _rejected: undefined,
+    })
+      .import({
+        __is_sqli: 'lib-inject',
+        __is_xss: 'lib-inject',
+        __sqli_fingerprint: 'lib-inject',
+      })
+      .listen(8000)
+      .demuxHTTP().to(
+        $=>$
+            .use('/etc/pipy/modules/inject-nmi.so')
+            .handleMessage(() => _rejected = (__is_sqli || __is_xss))
+            .branch(
+                () => _rejected === true, (
+                $=>$
+                .handleMessageStart(_ =>
+                  console.log(`SQL Injection found with Fingerprint: ${__sqli_fingerprint}`))
+                .replaceMessage(new Message({ status: 403 }, 'Forbidden'))
+                ),
+                () => _rejected === false, (
+                  $=>$.muxHTTP().to(
+                      $=>$.connect('localhost:80')
+                  )
+                )
+            )
+      )
+
