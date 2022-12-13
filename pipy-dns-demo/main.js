@@ -7,6 +7,7 @@
     setDNS,
     getDNS,
   } = pipy.solve('cache.js'),
+  line = pipy.solve('smart-line.js'),
 ) =>
 
   pipy({
@@ -24,6 +25,7 @@
             || local.query(query.question[0].name, query.question[0].type)
           ),
           record ? (
+            record = line.filter(__inbound.remoteAddress, record),
             res = {},
             res.qr = res.rd = res.ra = res.aa = 1,
             res.id = query.id,

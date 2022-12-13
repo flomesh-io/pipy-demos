@@ -3,13 +3,15 @@
     "name": "example.com",
     "type": "A",
     "ttl": 60,
-    "rdata": "192.168.139.10"
+    "rdata": "192.168.139.10",
+    "labels": ["line1"]
   },
   {
     "name": "example.com",
     "type": "A",
     "ttl": 60,
-    "rdata": "192.168.139.11"
+    "rdata": "192.168.139.11",
+    "labels": ["line2"]
   },
   {
     "name": "answer.com",
