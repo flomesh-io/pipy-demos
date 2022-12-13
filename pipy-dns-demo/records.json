@@ -1,0 +1,73 @@
+[
+  {
+    "name": "example.com",
+    "type": "A",
+    "ttl": 60,
+    "rdata": "192.168.139.10"
+  },
+  {
+    "name": "example.com",
+    "type": "A",
+    "ttl": 60,
+    "rdata": "192.168.139.11"
+  },
+  {
+    "name": "answer.com",
+    "type": "AAAA",
+    "ttl": 600,
+    "rdata": "2405:6584:7840:800::1"
+  },
+  {
+    "name": "example.com",
+    "type": "CNAME",
+    "ttl": 600,
+    "rdata": "www.a.example.com"
+  },
+  {
+    "name": "example.com",
+    "type": "MX",
+    "ttl": 600,
+    "rdata": {
+      "preference": 10,
+      "exchange": "mail1.example.com"
+    }
+  },
+  {
+    "name": "example.com",
+    "type": "MX",
+    "ttl": 600,
+    "rdata": {
+      "preference": 10,
+      "exchange": "mail2.example.com"
+    }
+  },
+  {
+    "name": "example.com",
+    "type": "TXT",
+    "ttl": 600,
+    "rdata": "hi.pipy!"
+  },
+  {
+    "name": "example.com",
+    "type": "NS",
+    "ttl": 600,
+    "rdata": "ns1.example.com"
+  },
+  {
+    "name": "example.com",
+    "type": "NS",
+    "ttl": 600,
+    "rdata": "ns2.example.com"
+  },
+  {
+    "name": "example.com",
+    "type": "NS",
+    "ttl": 600,
+    "rdata": "ns3.example.com"
+  },
+  {
+    "name": "deny.example.com",
+    "type": "A",
+    "status": "deny"
+  }
+]
