@@ -1,0 +1,8 @@
+{
+  "services": {
+    "io.flomesh.demo.dubbo.api.DemoHelloService": {
+      "v1": 20,
+      "v2": 80
+    }
+  }
+}

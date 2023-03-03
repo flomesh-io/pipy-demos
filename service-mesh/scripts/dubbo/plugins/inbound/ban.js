@@ -27,7 +27,7 @@ pipy({
 .pipeline('request')
   .handleMessage(
     msg => __service && (
-      console.log(`__service: ${JSON.stringify(__service)}`),
+
       _iface = _ifaces[__service.iface],
       __turnDown = _iface && (
         _iface.white ? (

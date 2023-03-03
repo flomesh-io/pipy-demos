@@ -1,3 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: time-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+  name: time-service
+spec:
+  ports:
+  - port: 20880
+    protocol: TCP
+    targetPort: 20880
+    name: dubbo
+  selector:
+    app: time-service
+    app.flomesh.io/type: dubbo
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

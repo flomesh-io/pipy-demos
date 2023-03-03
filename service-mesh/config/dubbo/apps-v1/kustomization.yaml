@@ -1,0 +1,118 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  version: 'v1'
+  app.flomesh.io/type: dubbo  
+
+nameSuffix: '-v1'
+
+resources:
+  - ../resources/hello-service.yaml
+  - ../resources/date-service.yaml
+  - ../resources/time-service.yaml
+
+patches:
+  - path: ../patches/check-zookeeper-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/zk-env-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/no-proxychain-patch.yaml
+    target:
+      kind: Deployment
+  - path: ../patches/proxychain-patch.yaml
+    target:
+      kind: Deployment      
+  - path: ../patches/sidecar-patch.yaml
+    target:
+      kind: Deployment
+  - patch: |-
+      - op: add
+        path: /spec/selector/matchLabels/version
+        value: v1
+      - op: add
+        path: /spec/template/metadata/labels/version
+        value: v1
+    target:
+      kind: Deployment
+  - patch: |-
+      - op: add
+        path: /spec/selector/version
+        value: v1
+      - op: add
+        path: /metadata/labels/version
+        value: v1
+      - op: add
+        path: /spec/ports/-
+        value: {"port":20881,"protocol":"TCP","targetPort":20881,"name":"sidecar"}
+    target:
+      kind: Service
+
+images:
+  - name: flomesh/samples-consumer-svc
+    newName: flomesh/samples-consumer-svc
+    newTag: 1.0.0-dubbo
+  - name: flomesh/samples-hello-svc
+    newName: flomesh/samples-hello-svc
+    newTag: 1.0.0-dubbo
+  - name: flomesh/samples-date-svc
+    newName: flomesh/samples-date-svc
+    newTag: 1.0.0-dubbo
+  - name: flomesh/samples-time-svc
+    newName: flomesh/samples-time-svc
+    newTag: 1.0.0-dubbo
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: hello-service
+    spec:
+      template:
+        spec:
+          containers:
+            - name: app
+              env:
+                - name: time_service_version
+                  value: 'v1'
+                - name: date_service_version
+                  value: 'v1'
+                - name: hello_service_version
+                  value: 'v1'
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: date-service
+    spec:
+      template:
+        spec:
+          containers:
+            - name: app
+              env:
+                - name: time_service_version
+                  value: 'v1'
+                - name: date_service_version
+                  value: 'v1'
+                - name: hello_service_version
+                  value: 'v1'
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: time-service
+    spec:
+      template:
+        spec:
+          containers:
+            - name: app
+              env:
+                - name: time_service_version
+                  value: 'v1'
+                - name: date_service_version
+                  value: 'v1'
+                - name: hello_service_version
+                  value: 'v1'

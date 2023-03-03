@@ -1,0 +1,19 @@
+{
+  "services": {
+    "io.flomesh.demo.dubbo.api.DemoHelloService": {
+      "v1": ["hello-service-v1:20881"],
+      "v2": ["hello-service-v2:20881"],
+      "*": ["hello-service-v1:20881", "hello-service-v2:20881"]
+    },
+    "io.flomesh.demo.dubbo.api.DemoDateService": {
+      "v1": ["date-service-v1:20881"],
+      "v2": ["date-service-v2:20881"],
+      "*": ["date-service-v1:20881", "date-service-v2:20881"]
+    },
+    "io.flomesh.demo.dubbo.api.DemoTimeService": {
+      "v1": ["time-service-v1:20881"],
+      "v2": ["time-service-v2:20881"],
+      "*": ["time-service-v1:20881", "time-service-v2:20881"]
+    }
+  }
+}

@@ -45,6 +45,162 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
+    app: date-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v1
+  name: date-service-v1
+  namespace: dubbo
+spec:
+  ports:
+  - name: dubbo
+    port: 20880
+    protocol: TCP
+    targetPort: 20880
+  - name: sidecar
+    port: 20881
+    protocol: TCP
+    targetPort: 20881
+  selector:
+    app: date-service
+    app.flomesh.io/type: dubbo
+    version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: date-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v2
+  name: date-service-v2
+  namespace: dubbo
+spec:
+  ports:
+  - name: dubbo
+    port: 20880
+    protocol: TCP
+    targetPort: 20880
+  - name: sidecar
+    port: 20881
+    protocol: TCP
+    targetPort: 20881
+  selector:
+    app: date-service
+    app.flomesh.io/type: dubbo
+    version: v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v1
+  name: hello-service-v1
+  namespace: dubbo
+spec:
+  ports:
+  - name: dubbo
+    port: 20880
+    protocol: TCP
+    targetPort: 20880
+  - name: sidecar
+    port: 20881
+    protocol: TCP
+    targetPort: 20881
+  selector:
+    app: hello-service
+    app.flomesh.io/type: dubbo
+    version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v2
+  name: hello-service-v2
+  namespace: dubbo
+spec:
+  ports:
+  - name: dubbo
+    port: 20880
+    protocol: TCP
+    targetPort: 20880
+  - name: sidecar
+    port: 20881
+    protocol: TCP
+    targetPort: 20881
+  selector:
+    app: hello-service
+    app.flomesh.io/type: dubbo
+    version: v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: time-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v1
+  name: time-service-v1
+  namespace: dubbo
+spec:
+  ports:
+  - name: dubbo
+    port: 20880
+    protocol: TCP
+    targetPort: 20880
+  - name: sidecar
+    port: 20881
+    protocol: TCP
+    targetPort: 20881
+  selector:
+    app: time-service
+    app.flomesh.io/type: dubbo
+    version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: time-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v2
+  name: time-service-v2
+  namespace: dubbo
+spec:
+  ports:
+  - name: dubbo
+    port: 20880
+    protocol: TCP
+    targetPort: 20880
+  - name: sidecar
+    port: 20881
+    protocol: TCP
+    targetPort: 20881
+  selector:
+    app: time-service
+    app.flomesh.io/type: dubbo
+    version: v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
     app: zookeeper
     app.flomesh.io/type: dubbo
   name: zookeeper
@@ -165,6 +321,12 @@ spec:
           value: zookeeper
         - name: SAMPLES_ZK_PORT
           value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
         image: flomesh/samples-consumer-svc:1.0.0-dubbo
         imagePullPolicy: IfNotPresent
         name: app
@@ -201,7 +363,8 @@ metadata:
     app: date-service
     app.flomesh.io/type: dubbo
     sidecar-injected: "true"
-  name: date-service
+    version: v1
+  name: date-service-v1
   namespace: dubbo
 spec:
   replicas: 1
@@ -209,6 +372,7 @@ spec:
     matchLabels:
       app: date-service
       app.flomesh.io/type: dubbo
+      version: v1
   strategy: {}
   template:
     metadata:
@@ -219,6 +383,7 @@ spec:
       labels:
         app: date-service
         app.flomesh.io/type: dubbo
+        version: v1
     spec:
       containers:
       - command:
@@ -298,7 +463,155 @@ spec:
           value: zookeeper
         - name: SAMPLES_ZK_PORT
           value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
         image: flomesh/samples-date-svc:1.0.0-dubbo
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 20880
+        resources: {}
+        volumeMounts:
+        - mountPath: /proxychains
+          name: proxy-cfg
+      initContainers:
+      - command:
+        - bash
+        - -c
+        - |-
+          /wait-for-it.sh --strict --timeout=0 \
+            --host=zookeeper.dubbo.svc \
+            --port=2181 \
+            -- echo "SERVICE IS READY!"
+        image: flomesh/wait-for-it:1.0.0
+        imagePullPolicy: IfNotPresent
+        name: init
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+      - configMap:
+          name: proxychains-cfg
+        name: proxy-cfg
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: date-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v2
+  name: date-service-v2
+  namespace: dubbo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: date-service
+      app.flomesh.io/type: dubbo
+      version: v2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: date-service
+        prometheus.io/port: "6060"
+        prometheus.io/scrape: "true"
+      labels:
+        app: date-service
+        app.flomesh.io/type: dubbo
+        version: v2
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        - --admin-port=6060
+        env:
+        - name: TARGET_PORT
+          value: "20880"
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-328
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      - command:
+        - sh
+        - -c
+        - |-
+          proxychains4 -f /proxychains/proxychains.conf \
+            java -javaagent:/opentelemetry-javaagent.jar \
+            -Dotel.traces.exporter=logging \
+            -Dotel.metrics.exporter=none \
+            -Dotel.propagators=tracecontext,baggage,b3multi \
+            -Dotel.resource.attributes="service.name=${SERVICE_NAME}" \
+            -Dotel.javaagent.debug=false \
+            -Djava.security.egd=file:/dev/./urandom \
+            -Xms512m -Xmx1024m \
+            -Djava.security.egd=file:/dev/./urandom \
+            -jar /app.jar
+        env:
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SAMPLES_ZK_HOSTNAME
+          value: zookeeper
+        - name: SAMPLES_ZK_PORT
+          value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
+        image: flomesh/samples-date-svc:2.0.0-dubbo
         imagePullPolicy: IfNotPresent
         name: app
         ports:
@@ -334,7 +647,8 @@ metadata:
     app: hello-service
     app.flomesh.io/type: dubbo
     sidecar-injected: "true"
-  name: hello-service
+    version: v1
+  name: hello-service-v1
   namespace: dubbo
 spec:
   replicas: 1
@@ -342,6 +656,7 @@ spec:
     matchLabels:
       app: hello-service
       app.flomesh.io/type: dubbo
+      version: v1
   strategy: {}
   template:
     metadata:
@@ -352,6 +667,7 @@ spec:
       labels:
         app: hello-service
         app.flomesh.io/type: dubbo
+        version: v1
     spec:
       containers:
       - command:
@@ -431,7 +747,155 @@ spec:
           value: zookeeper
         - name: SAMPLES_ZK_PORT
           value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
         image: flomesh/samples-hello-svc:1.0.0-dubbo
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 20880
+        resources: {}
+        volumeMounts:
+        - mountPath: /proxychains
+          name: proxy-cfg
+      initContainers:
+      - command:
+        - bash
+        - -c
+        - |-
+          /wait-for-it.sh --strict --timeout=0 \
+            --host=zookeeper.dubbo.svc \
+            --port=2181 \
+            -- echo "SERVICE IS READY!"
+        image: flomesh/wait-for-it:1.0.0
+        imagePullPolicy: IfNotPresent
+        name: init
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+      - configMap:
+          name: proxychains-cfg
+        name: proxy-cfg
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v2
+  name: hello-service-v2
+  namespace: dubbo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-service
+      app.flomesh.io/type: dubbo
+      version: v2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: hello-service
+        prometheus.io/port: "6060"
+        prometheus.io/scrape: "true"
+      labels:
+        app: hello-service
+        app.flomesh.io/type: dubbo
+        version: v2
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        - --admin-port=6060
+        env:
+        - name: TARGET_PORT
+          value: "20880"
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-328
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      - command:
+        - sh
+        - -c
+        - |-
+          proxychains4 -f /proxychains/proxychains.conf \
+            java -javaagent:/opentelemetry-javaagent.jar \
+            -Dotel.traces.exporter=logging \
+            -Dotel.metrics.exporter=none \
+            -Dotel.propagators=tracecontext,baggage,b3multi \
+            -Dotel.resource.attributes="service.name=${SERVICE_NAME}" \
+            -Dotel.javaagent.debug=false \
+            -Djava.security.egd=file:/dev/./urandom \
+            -Xms512m -Xmx1024m \
+            -Djava.security.egd=file:/dev/./urandom \
+            -jar /app.jar
+        env:
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SAMPLES_ZK_HOSTNAME
+          value: zookeeper
+        - name: SAMPLES_ZK_PORT
+          value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
+        image: flomesh/samples-hello-svc:2.0.0-dubbo
         imagePullPolicy: IfNotPresent
         name: app
         ports:
@@ -467,7 +931,8 @@ metadata:
     app: time-service
     app.flomesh.io/type: dubbo
     sidecar-injected: "true"
-  name: time-service
+    version: v1
+  name: time-service-v1
   namespace: dubbo
 spec:
   replicas: 1
@@ -475,6 +940,7 @@ spec:
     matchLabels:
       app: time-service
       app.flomesh.io/type: dubbo
+      version: v1
   strategy: {}
   template:
     metadata:
@@ -485,6 +951,7 @@ spec:
       labels:
         app: time-service
         app.flomesh.io/type: dubbo
+        version: v1
     spec:
       containers:
       - command:
@@ -564,7 +1031,155 @@ spec:
           value: zookeeper
         - name: SAMPLES_ZK_PORT
           value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
         image: flomesh/samples-time-svc:1.0.0-dubbo
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 20880
+        resources: {}
+        volumeMounts:
+        - mountPath: /proxychains
+          name: proxy-cfg
+      initContainers:
+      - command:
+        - bash
+        - -c
+        - |-
+          /wait-for-it.sh --strict --timeout=0 \
+            --host=zookeeper.dubbo.svc \
+            --port=2181 \
+            -- echo "SERVICE IS READY!"
+        image: flomesh/wait-for-it:1.0.0
+        imagePullPolicy: IfNotPresent
+        name: init
+      volumes:
+      - emptyDir: {}
+        name: cache-volume
+      - configMap:
+          name: proxychains-cfg
+        name: proxy-cfg
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: time-service
+    app.flomesh.io/type: dubbo
+    sidecar-injected: "true"
+    version: v2
+  name: time-service-v2
+  namespace: dubbo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: time-service
+      app.flomesh.io/type: dubbo
+      version: v2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        app.flomesh.io/name: time-service
+        prometheus.io/port: "6060"
+        prometheus.io/scrape: "true"
+      labels:
+        app: time-service
+        app.flomesh.io/type: dubbo
+        version: v2
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/pipy
+        - http://pipy-repo.pipy:6060/repo/$(SERVICE_NAME)/
+        - --admin-port=6060
+        env:
+        - name: TARGET_PORT
+          value: "20880"
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_ns
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: _pod_nodeName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: _pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: _pod_serviceName
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: _pod_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: _pod_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: _pod_hostIP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: flomesh/pipy-pjs:0.4.0-328
+        name: sidecar
+        volumeMounts:
+        - mountPath: /opt/data
+          name: cache-volume
+      - command:
+        - sh
+        - -c
+        - |-
+          proxychains4 -f /proxychains/proxychains.conf \
+            java -javaagent:/opentelemetry-javaagent.jar \
+            -Dotel.traces.exporter=logging \
+            -Dotel.metrics.exporter=none \
+            -Dotel.propagators=tracecontext,baggage,b3multi \
+            -Dotel.resource.attributes="service.name=${SERVICE_NAME}" \
+            -Dotel.javaagent.debug=false \
+            -Djava.security.egd=file:/dev/./urandom \
+            -Xms512m -Xmx1024m \
+            -Djava.security.egd=file:/dev/./urandom \
+            -jar /app.jar
+        env:
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations['app.flomesh.io/name']
+        - name: SAMPLES_ZK_HOSTNAME
+          value: zookeeper
+        - name: SAMPLES_ZK_PORT
+          value: "2181"
+        - name: time_service_version
+          value: v1
+        - name: date_service_version
+          value: v1
+        - name: hello_service_version
+          value: v1
+        image: flomesh/samples-time-svc:2.0.0-dubbo
         imagePullPolicy: IfNotPresent
         name: app
         ports:

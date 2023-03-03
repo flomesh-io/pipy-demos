@@ -5,10 +5,10 @@ commonLabels:
   app.flomesh.io/type: dubbo
 
 resources:
-- ../resources/consumer-service.yaml
-- ../resources/hello-service.yaml
-- ../resources/date-service.yaml
-- ../resources/time-service.yaml
+  - ../resources/consumer-service.yaml
+  # - ../resources/hello-service.yaml
+  # - ../resources/date-service.yaml
+  # - ../resources/time-service.yaml
 
 patches:
   - path: ../patches/check-zookeeper-patch.yaml
@@ -26,3 +26,22 @@ patches:
   - path: ../patches/sidecar-patch.yaml
     target:
       kind: Deployment        
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: consumer-service
+    spec:
+      template:
+        spec:
+          containers:
+            - name: app
+              env:
+                - name: time_service_version
+                  value: 'v1'
+                - name: date_service_version
+                  value: 'v1'
+                - name: hello_service_version
+                  value: 'v1'

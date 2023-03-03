@@ -8,3 +8,5 @@ resources:
   - ./resources/configmap-proxychain.yaml
   - ./zookeeper
   - ./apps
+  - ./apps-v1
+  - ./apps-v2

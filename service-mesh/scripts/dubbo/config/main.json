@@ -11,7 +11,7 @@
     "plugins/logger.js",
     "plugins/metric.js",
     "plugins/circuit-breaker.js",
-    "plugins/forward.js"
+    "plugins/balancer.js"
   ],
   "tasks": [
     "tasks/heartbeat.js",

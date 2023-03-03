@@ -18,13 +18,14 @@ Table of Content:
   * [3.3. Circuit breaker](#33-circuit-breaker)
     * [3.3.1 SpringBoot](#331-springboot)
     * [3.3.2 Bookinfo](#332-bookinfo)
-  * [3.4. Black/White List & ACL](#34-blackwhite-list--acl)
+  * [3.4. Black/White List \& ACL](#34-blackwhite-list--acl)
     * [3.4.1 SpringBoot](#341-springboot)
     * [3.4.2 Bookinfo](#342-bookinfo)
 * [4. Dubbo Operating](#4-dubbo-operating)
+  * [4.1 Canary](#41-canary)
   * [4.1. Rate Limit](#41-rate-limit)
   * [4.2. Cricuit Breaker](#42-cricuit-breaker)
-  * [4.3. Black/White List & ACL](#43-blackwhite-list--acl)
+  * [4.3. Black/White List \& ACL](#43-blackwhite-list--acl)
 * [5. Observability](#5-observability)
   * [5.1. Logging](#51-logging)
   * [5.2. Tracing](#52-tracing)
@@ -305,6 +306,21 @@ Content-Length: 80
 Date: Sun, 27 Feb 2022 13:23:42 GMT
 
 V1-[hello-service] : Hello, world, Today is (2022-02-27), Time is (13:23:42.739)
+```
+
+### 4.1 Canary
+
+As the configuration defined in [router.json](scripts/dubbo/config/router.json), you can adjust the weight of target instance.
+
+```json
+{
+  "services": {
+    "io.flomesh.demo.dubbo.api.DemoHelloService": {
+      "v1": 20,
+      "v2": 80
+    }
+  }
+}
 ```
 
 ### 4.1. Rate Limit

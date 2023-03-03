@@ -1,8 +1,17 @@
 /**
  * Remote service detecting: interface:method(args)
  */
-pipy({
 
+(config =>
+pipy({
+  _routes: Object.fromEntries(
+    Object.entries(config.services).map(
+      ([k, v]) => [
+        k,
+        v ? new algo.RoundRobinLoadBalancer(v) : null
+      ]
+    )
+  ),
 })
 
 .import({
@@ -32,9 +41,11 @@ pipy({
             args: args,
             remote: attachments?.['remote.application']
           },
+          _routes[iface] && ( __service.version = _routes[iface]?.select()),
           __serviceID = `${iface}:${method}(${args})`
         ) : (
           __turnDown = true
         )
     ))()
   )
+)(JSON.decode(pipy.load('config/router.json')))
