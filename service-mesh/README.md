@@ -23,9 +23,9 @@ Table of Content:
     * [3.4.2 Bookinfo](#342-bookinfo)
 * [4. Dubbo Operating](#4-dubbo-operating)
   * [4.1 Canary](#41-canary)
-  * [4.1. Rate Limit](#41-rate-limit)
-  * [4.2. Cricuit Breaker](#42-cricuit-breaker)
-  * [4.3. Black/White List \& ACL](#43-blackwhite-list--acl)
+  * [4.2 Rate Limit](#42-rate-limit)
+  * [4.3 Cricuit Breaker](#43-cricuit-breaker)
+  * [4.4 Black/White List \& ACL](#44-blackwhite-list--acl)
 * [5. Observability](#5-observability)
   * [5.1. Logging](#51-logging)
   * [5.2. Tracing](#52-tracing)
@@ -323,7 +323,7 @@ As the configuration defined in [router.json](scripts/dubbo/config/router.json),
 }
 ```
 
-### 4.1. Rate Limit
+### 4.2 Rate Limit
 
 Update the config in [throttle.json](scripts/dubbo/config/inbound/throttle.json). The current setting of request rating is `10`.
 
@@ -357,7 +357,7 @@ Transfer/sec:      2.08KB
 
 Adjust the limit rate as you hope and run the test below. **One more thing to note, keep the option of *thread* and *connection* same for wrk.**
 
-### 4.2. Cricuit Breaker
+### 4.3 Cricuit Breaker
 
 Go into config [circuit-breaker.json](scripts/dubbo/config/circuit-breaker.json), and set value of `enable` to `true`. Now you enable the circuit breaker for service `io.flomesh.demo.dubbo.api.DemoHelloService:sayHello(Ljava/lang/String;)`. You can also find the fallback reponse there.
 
@@ -375,7 +375,7 @@ V1-[hello-service] : Hello, world, Today is (2222-02-22), Time is (22:22:22.222)
 
 It does respond the fallback responce instead of current date and time.
 
-###  4.3. Black/White List & ACL
+###  4.4 Black/White List & ACL
 
 The balck/white list feature is same as SpringBoot one. Update the list in config [ban.json](scripts/dubbo/config/inbound/ban.json).
 
