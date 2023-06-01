@@ -1,0 +1,52 @@
+{
+  "loadBalancers": {
+    "127.0.0.1:8080": {
+      "mode": "rr",
+      "sticky": false,
+      "targets": {
+        "192.168.1.160:8080": 100
+      },
+      "bpsLimit": -1,
+      "maxConnections": -1,
+      "idleTimeout": "300s",
+      "serviceId": 1,
+      "serviceName": "svc-1"
+    }
+  },
+  "tunnel": {
+    "reverseMode": true,
+    "servers": {
+      "0.0.0.0:8443": {
+        "name": "tunnel-1",
+        "shadowPort": 8444,
+        "weight": 100,
+        "tlsCert": "tls/server1.crt",
+        "tlsKey": "tls/server1.key",
+        "tlsCA": "tls/server1.ca"
+      }
+    },
+    "policies": {
+      "connectRetry": 0
+    },
+    "healthcheck": {
+      "server": {
+        "failures": 2,
+        "interval": "3s"
+      },
+      "target": {
+        "failures": 1,
+        "interval": "15s"
+      },
+      "connectTimeout": "1s",
+      "readTimeout": "5s"
+    }
+  },
+  "healthcheck": {
+    "host": "localhost",
+    "port": 8888,
+    "interval": "1s"
+  },
+  "global": {
+    "enableDebug": true
+  }
+}

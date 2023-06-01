@@ -1,0 +1,15 @@
+{
+  "reverseServer": {
+    "target": "20.187.107.151:8443",
+    "idleTimeout": "300s",
+    "tlsCert": "tls/server1.crt",
+    "tlsKey": "tls/server1.key",
+    "tlsCA": "tls/server1.ca"
+  },
+  "policies": {
+    "connectRetry": 1
+  },
+  "global": {
+    "enableDebug": true
+  }
+}
