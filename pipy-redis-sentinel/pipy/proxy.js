@@ -36,11 +36,11 @@
         _reqTime = Date.now()
       )
     )
-    .handleData(
-      req => (
-        console.log(`Sending request to node ${_target}:\nRequest: ${JSON.encode(req.toString())}`)
-      )
-    )
+    // .handleData(
+    //   req => (
+    //     //console.log(`Sending request to node ${_target}:\nRequest: ${JSON.encode(req.toString())}`)
+    //   )
+    // )
     .connect(() => _target,
       {
         connectTimeout: config.connectTimeout,
@@ -49,8 +49,9 @@
     )
     .handleData(
       data => (
-        _requestLatency.observe(Date.now() - _reqTime),
-        console.log(`Response received from node ${_target}:\nResponse: ${JSON.encode(data.toString())}`)
+        _requestLatency.observe(Date.now() - _reqTime)
+        // ,
+        // console.log(`Response received from node ${_target}:\nResponse: ${JSON.encode(data.toString())}`)
       )
     )
 
