@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   pipy:
-    image: naqvis/pipy:0.30.0-23
+    image: flomesh/pipy:0.90.3-2
     container_name: pipy-proxy
     volumes:
       - ./pipy:/proxy:ro
