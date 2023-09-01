@@ -3,7 +3,6 @@
     _servers: new algo.RoundRobinLoadBalancer(config.servers, unhealthy_nodes),
     _masters: new algo.RoundRobinLoadBalancer(config.servers, unhealthy_master),
     _target: '',
-    _counter: null,
     _reqTime: 0,
     _commandCounter: new stats.Counter('command', ['command']),
     _requestLatency: new stats.Histogram('request_latency', new Array(16).fill(0).map((_, i) => Math.pow(2, i))),
@@ -38,7 +37,7 @@
     )
     .handleData(
       req => (
-        console.log(`Sending request to node ${_target}:\nRequest: ${JSON.encode(req.toString())}`)
+        config.debug && console.log(`Sending request to node ${_target}:\nRequest: ${JSON.encode(req.toString())}`)
       )
     )
     .connect(() => _target,
@@ -50,49 +49,41 @@
     .handleData(
       data => (
         _requestLatency.observe(Date.now() - _reqTime),
-        console.log(`Response received from node ${_target}:\nResponse: ${JSON.encode(data.toString())}`)
+        config.debug && console.log(`Response received from node ${_target}`)
       )
     )
-
     .task(config.healthcheck.interval)
-    .handleStreamStart(
+    .onStart(() => new Message)
+    .handleMessageStart(
       () => (
         unhealthy_nodes.clear(),
         unhealthy_master.clear(),
         config.servers.forEach(t => (
           unhealthy_nodes.set(t, true),
           unhealthy_master.set(t, true)
-        )),
-        _counter = { n: 0 }
+        ))
       )
     )
-    .fork('per-node',
-      () => (config.servers.map(t => ({ _target: t }))))
+    .fork(() => (config.servers)).to(
+      $=>$
+        .onStart(target => void (_target = target))
+        .replaceMessage(
+          () => (
+            new Message("info replication\r\n")
+          )
+        )
+        .connect(() => _target,
+          {
+            connectTimeout: config.healthcheck.connectTimeout,
+            readTimeout: config.healthcheck.readTimeout
+          }
+        )
+        .handleData(
+          data => _check(data)
+        )
+    )
     .replaceMessage(
       new StreamEnd
     )
-    .wait(
-      () => _counter.n === 0
-    )
-
-    .pipeline('per-node')
-    .replaceMessage(
-      () => (
-        _counter.n++,
-        new Message("info replication\r\n")
-      )
-    )
-    .connect(
-      () => _target,
-      {
-        connectTimeout: config.healthcheck.connectTimeout,
-        readTimeout: config.healthcheck.readTimeout
-      }
-    )
-    .handleData(
-      data => _check(data)
-    )
-    .handleStreamEnd(
-      () => _counter.n--
-    )
+    .wait(() => new Timeout(config.healthcheck.maxTimeout).wait())
 ))(JSON.decode(pipy.load('config/config.json')), new algo.Cache(), new algo.Cache())
