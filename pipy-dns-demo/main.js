@@ -14,10 +14,10 @@
     _forward: false,
   })
     .listen(5300, { protocol: 'udp' })
-    .replaceMessage(
-      msg => (
+    .replaceData(
+      data => (
         (query, res, record) => (
-          query = DNS.decode(msg.body),
+          query = DNS.decode(data),
           //valid query
           query?.question?.[0]?.name && query?.question?.[0]?.type && (
             //query cache
@@ -41,7 +41,7 @@
             new Message(DNS.encode(res))
           ) : (
             _forward = true,
-            msg
+            data
           )
         )
       )()
@@ -49,8 +49,8 @@
       () => _forward, $ => $
         .connect(() => `${config.upstreamDNSServer}:53`, { protocol: 'udp' })
         .handleMessage(
-          msg => (
-            (res = DNS.decode(msg.body)) => (
+          data => (
+            (res = DNS.decode(data)) => (
               res?.question?.[0]?.name && res?.question?.[0]?.type &&
               !res?.rcode && (
                 setDNS(res.question[0].type + '#' + res.question[0].name,
