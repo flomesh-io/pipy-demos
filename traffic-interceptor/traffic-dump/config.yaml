@@ -1,0 +1,12 @@
+services:
+  - port: 30881
+    originalPort: 20881
+    type: dubbo
+  - port: 30880
+    originalPort: 20880  
+    type: dubbo
+  - port: 9000
+    originalPort: 8000
+    type: http
+logging:
+  url: http://localhost:9200
