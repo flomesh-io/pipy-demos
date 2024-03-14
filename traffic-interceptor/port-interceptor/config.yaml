@@ -5,3 +5,5 @@ interceptors:
     originalPort: 8000
   - port: 9443
     originalPort: 8443
+  - port: 30880
+    originalPort: 20880    
