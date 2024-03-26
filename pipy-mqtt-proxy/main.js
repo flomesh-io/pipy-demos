@@ -8,25 +8,23 @@ var plugins = config.plugins.map(
 
 var $ctx
 var $inbound
-pipy.listen(8000, $=>$.connect('localhost:1883'))
+pipy.listen(8000, $ => $.connect('localhost:1883'))
 
 pipy.listen(config.listen, $ => $
   .onStart(ib => void ($inbound = ib))
   .decodeMQTT()
-  .demux({}).to($ => $
-    .handleMessageStart(function (msg) {
-      $ctx = {
-        protocalLevel: msg.head.protocolLevel,
-        type: msg?.head?.type,
-        target: null,
-        inbound: $inbound,
-      }
-      //record connection message
-      if (msg?.head?.type == 'CONNECT') {
-        $ctx.connMsg = msg
-      } 
-    })
-    .pipe(plugins, () => $ctx)
-  )
+  .handleMessageStart(function (msg) {
+    $ctx = {
+      protocalLevel: msg.head.protocolLevel,
+      type: msg?.head?.type,
+      target: null,
+      inbound: $inbound,
+    }
+    //record connection message
+    if (msg?.head?.type == 'CONNECT') {
+      $ctx.connMsg = msg
+    }
+  })
+  .pipe(plugins, () => $ctx)
   .encodeMQTT()
 )

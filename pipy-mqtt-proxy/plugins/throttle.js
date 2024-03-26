@@ -14,16 +14,16 @@ export default pipeline($ => $
         default: return 'bypass'
       }
     }, {
-    'conn-throttle': pipeline($ => $
+    'conn-throttle': $ => $
       .throttleMessageRate(function(){
         return $connQuota
       })
       .pipeNext()
-    ),
-    'pub-throttle': pipeline($ => $
+    ,
+    'pub-throttle': $ => $
       .throttleMessageRate(() => $pubQuota)
       .pipeNext()
-    ),
+    ,
     'bypass': $ => $.pipeNext()
   })
 )
