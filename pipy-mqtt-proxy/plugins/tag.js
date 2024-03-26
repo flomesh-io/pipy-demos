@@ -1,15 +1,14 @@
-(config =>
-pipy()
+import config from '/config.js'
 
-.pipeline('request')
-  .handleMessageStart(
-    msg => config.tags && Object.entries(config.tags).length > 0 && (
-      msg.head.properties ? (
-        msg.head.properties.assign(config.tags)
-      ) : (
+export default pipeline($ => $
+  .handleMessageStart(function (msg) {
+    if (config.tags && Object.entries(config.tags).length > 0) {
+      if (msg.head.properties) {
+        Object.assign(msg.head.properties, config.tags)
+      } else {
         msg.head.properties = config.tags
-      )
-    )
-  )
-
-)(JSON.decode(pipy.load('config/tag.json')))
+      }
+    }
+  })
+  .pipeNext()
+)

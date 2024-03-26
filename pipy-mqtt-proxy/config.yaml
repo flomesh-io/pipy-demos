@@ -1,0 +1,28 @@
+listen: 1884
+brokers:
+  - localhost:1883
+limits:
+  conn:
+    rate: 20
+    blockInput: true
+  pub:
+    rate: 20
+    blockInput: true
+tags:
+  proxy: pipy
+ids:
+  allow:
+    - client-1
+    - client-2
+  deny:
+    - client-3
+creds:
+  flomesh: pipy  
+plugins:
+  - tag
+  - logger
+  - metrics
+  # - identify
+  - credential
+  - throttle
+  - balancer

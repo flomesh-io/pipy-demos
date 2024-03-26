@@ -1,26 +1,28 @@
-(config =>
-pipy()
+import config from '/config.js'
 
-.import({
-  __turnDown: 'main',
-})
+var $ctx
+var $clientID
 
-.pipeline('request')
+export default pipeline($ => $
+  .onStart(ctx => void ($ctx = ctx))
   .handleMessageStart(
-    msg => msg?.head?.type == 'CONNECT' && (
-      __turnDown = !Boolean(config.ids.find(el => el == msg?.head?.clientID))
-    )
+    msg => void ($clientID = msg?.head?.clientID)
   )
-  .link(
-    'deny', () => __turnDown,
-    'bypass'
+  .pipe(
+    function () {
+      if ($ctx.type == 'CONNECT') {
+        if (config?.ids?.deny?.includes($clientID)) {
+          return 'deny'
+        }
+        if (config?.ids?.allow?.length > 0 && !config?.ids?.allow?.includes($clientID)) {
+          return 'deny'
+        }
+      }
+      return 'bypass'
+    }, {
+    'bypass': $ => $.pipeNext(),
+    'deny': $ => $.replaceMessage(
+      () => new Message({ type: 'CONNACK', reasonCode: 133, sessionPresent: false }, 'Client Identifier not valid')
     )
-
-
-.pipeline('bypass')
-
-.pipeline('deny')
-  .replaceMessage(
-    () => new Message({type: 'CONNACK', reasonCode: 133, sessionPresent: false}, '')
-  )  
-)(JSON.decode(pipy.load('config/identify.json')))
+  })
+)

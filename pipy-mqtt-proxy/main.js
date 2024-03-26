@@ -1,31 +1,32 @@
-(config =>
-pipy()
+import config from './config.js'
+import balancer from './plugins/balancer.js'
 
-.export('main', {
-  __connect: null,
-  __turnDown: false,
-})
+//init plugins
+var plugins = config.plugins.map(
+  name => pipy.import(`./plugins/${name}.js`).default
+)
 
-.listen(8000)
-  .connect(() => config.broker)
+var $ctx
+var $inbound
+pipy.listen(8000, $=>$.connect('localhost:1883'))
 
-.listen(1884)
+pipy.listen(config.listen, $ => $
+  .onStart(ib => void ($inbound = ib))
   .decodeMQTT()
-  .handleMessageStart(
-    msg => msg?.head?.type == 'CONNECT' && (__connect = msg)
+  .demux({}).to($ => $
+    .handleMessageStart(function (msg) {
+      $ctx = {
+        protocalLevel: msg.head.protocolLevel,
+        type: msg?.head?.type,
+        target: null,
+        inbound: $inbound,
+      }
+      //record connection message
+      if (msg?.head?.type == 'CONNECT') {
+        $ctx.connMsg = msg
+      } 
+    })
+    .pipe(plugins, () => $ctx)
   )
-  .demux('request')
-  .handleMessageStart(
-    msg => __turnDown = (msg.head.type == 'CONNACK' || msg.head.type == 'PUBACK' || msg.head.type == 'SUBACK')
-  )
-  .use(['plugins/balancer.js'], 'request', () => __turnDown)
-  .demux('response')
   .encodeMQTT()
-
-.pipeline('request')
-  .use(config.plugins, 'request', () => __turnDown)
-
-.pipeline('response')
-  .use(config.plugins.reverse(), 'response')
-
-)(JSON.decode(pipy.load('config/main.json')))
+)

@@ -1,30 +1,21 @@
-(config =>
-pipy({
-  _protocolLevel: 4,
-  _balancer: new algo.LeastWorkLoadBalancer(config.brokers),
-})
+import config from '/config.js'
 
-.export('balancer', {
-  __target: null,
-})
+var balancer = new algo.LoadBalancer(config.brokers, { algorithm: 'round-robin' })
 
-.pipeline('request')
+var $ctx
+var $conn
+export default pipeline($ => $
+  .onStart(ctx => void ($ctx = ctx))
+  .onEnd(() => $conn.free())
   .handleStreamStart(
-    () => __target = _balancer.select()
-  )
-  .handleStreamEnd(
-    () => _balancer.deselect(__target)
-  )
-  .handleMessageStart(
-    msg => (
-      msg.head.type === 'CONNECT' && (
-        _protocolLevel = msg.head.protocolLevel
-      )
-    )
+    function () {
+      $conn = balancer.allocate()
+      $ctx.target = $conn.target
+    }
   )
   .encodeMQTT()
-  .connect(() => __target)
+  .connect(() => $conn.target)
   .decodeMQTT({
-    protocolLevel: () => _protocolLevel,
+    protocolLevel: () => $conn.protocalLevel,
   })
-)(JSON.decode(pipy.load('config/balancer.json')))  
+)

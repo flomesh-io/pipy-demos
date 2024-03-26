@@ -1,25 +1,29 @@
-(config =>
-pipy({
-  _type: '', // CONNECT/PUBLISH/SUBSCRIBE
-})
+import config from '/config.js'
 
-.pipeline('request')
-  .handleMessageStart(
-    msg => _type = msg.head.type
-  )
-  .link(
-    'conn-throttle', () => _type === 'CONNECT' && Boolean(config?.connRate),
-    'pub-throttle', () => _type === 'PUBLISH' && Boolean(config?.pubRate),
-    'bypass'
-  )
-  
-.pipeline('conn-throttle')
-  .throttleMessageRate(()=> config.connRate)
+var $connQuota = new algo.Quota(Number.parseFloat(config.limits.conn.rate), { per: 1, blockInput: config.limits.conn.blockInput })
+var $pubQuota = new algo.Quota(Number.parseFloat(config.limits.pub.rate), { per: 1, blockInput: config.limits.pub.blockInput })
 
-
-.pipeline('pub-throttle')
-  .throttleMessageRate(() => config.pubRate, () => __inbound)
-
-.pipeline('bypass')  
-
-)(JSON.decode(pipy.load('config/throttle.json')))
+var $ctx
+export default pipeline($ => $
+  .onStart(ctx => void ($ctx = ctx))
+  .pipe(
+    function () {
+      switch ($ctx.type) {
+        case 'CONNECT': return 'conn-throttle'
+        case 'PUBLISH': return 'pub-throttle'
+        default: return 'bypass'
+      }
+    }, {
+    'conn-throttle': pipeline($ => $
+      .throttleMessageRate(function(){
+        return $connQuota
+      })
+      .pipeNext()
+    ),
+    'pub-throttle': pipeline($ => $
+      .throttleMessageRate(() => $pubQuota)
+      .pipeNext()
+    ),
+    'bypass': $ => $.pipeNext()
+  })
+)

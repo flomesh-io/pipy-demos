@@ -1,25 +1,30 @@
-(config =>
-  pipy()
+import config from '/config.js'
 
-.import({
-  __turnDown: 'main',
-})
-  
-.pipeline('request')
+var $ctx
+var $username
+var $password
+
+
+export default pipeline($ => $
+  .onStart(ctx => void ($ctx = ctx))
   .handleMessageStart(
-    msg => msg?.head?.type == 'CONNECT' && (
-      __turnDown = !msg?.head?.username || !Boolean(config.creds[msg?.head?.username] == msg?.head?.password)
+    function (msg) {
+      $username = msg?.head?.username
+      $password = msg?.head?.password
+    }
+  ).pipe(function() {
+    if ($ctx.type == 'CONNECT') {
+      console.log(`$username: ${JSON.stringify($username)}`)
+      console.log(`$password: ${JSON.stringify($password)}`)
+      if (!$username || config.creds[$username] !== $password) {
+        return 'deny'
+      }
+    }
+    return 'bypass'
+  },{
+    'bypass': $ => $.pipeNext(),
+    'deny': $ => $.replaceMessage(
+      () => new Message({ type: 'CONNACK', reasonCode: 134, sessionPresent: false }, 'Bad User Name or Password')
     )
-  )
-  .link(
-    'deny', () => __turnDown,
-    'bypass'
-    )
-
-.pipeline('bypass')
-
-.pipeline('deny')
-  .replaceMessage(
-    () => new Message({type: 'CONNACK', reasonCode: 134, sessionPresent: false}, '')
-  )  
-)(JSON.decode(pipy.load('config/credential.json')))
+  })
+)

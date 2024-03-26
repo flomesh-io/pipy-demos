@@ -1,44 +1,55 @@
-pipy({
-})
+// configure logger to stdout
+var logger = new logging.JSONLogger('console')//.toStdout()
 
-.import({
-  __connect: 'main',
-  __target: 'balancer',
-})
+var $ctx
+var $reqHead
+var $reqTime
+var $reqSize
+var $resHead
+var $resTime
+var $resSize
 
-.pipeline('request')
-  .fork('log-req')
-  
-.pipeline('response')
-  .fork('log-res')
-
-.pipeline('log-req')
-  .link('log-send')
-  
-.pipeline('log-res')
-  .link('log-send')
-
-.pipeline('log-send')
-  .replaceMessage(
-    msg => new Message(
-      JSON.encode({
-        clientID: __connect?.head?.clientID,
-        ...msg?.head,
-        broker: __target,
-        timestamp: Date.now()
-        //
-      }).push('\n')
-    ) 
+export default pipeline($ => $
+  .onStart(ctx => void ($ctx = ctx))
+  .handleMessageStart(
+    function (msg) {
+      $reqHead = msg.head
+      $reqTime = Date.now()
+    }
   )
-  .merge('sink', '')
-
-  .pipeline('sink')
-    .pack(
-      1000,
-      {
-        timeout: 2
-      }
-    )
-    .handleMessage(
-      msg => console.log(msg?.body)
-    )
+  .handleData(
+    function (data) {
+      $reqSize += data.size
+    }
+  )
+  .pipeNext()
+  .handleMessageStart(
+    function (msg) {
+      $resHead = msg.head
+      $resTime = Date.now()
+    }
+  )
+  .handleData(
+    function (data) {
+      $resSize += data.size
+    }
+  )
+  .handleMessageEnd(
+    function () {
+      var ib = $ctx.inbound
+      logger.log({
+        remoteAddr: ib.remoteAddress,
+        remotePort: ib.remotePort,
+        req: $reqHead,
+        res: $resHead,
+        reqSize: $reqSize,
+        resSize: $resSize,
+        reqTime: $reqTime,
+        resTime: $resTime,
+        endTime: Date.now(),
+        broker: $ctx.target,
+        clientID: $ctx.connMsg?.head?.clientID,
+      })
+    }
+  )
+)
