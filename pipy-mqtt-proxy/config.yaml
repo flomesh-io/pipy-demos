@@ -20,7 +20,7 @@ ids:
     - client-3
 creds:
   username: flomesh
-  password: pipy  
+  password: pipy
 plugins:
   - tag
   - tracing

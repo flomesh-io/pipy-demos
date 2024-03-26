@@ -1,5 +1,5 @@
 // configure logger to stdout
-var logger = new logging.JSONLogger('console')//.toStdout()
+var logger = new logging.JSONLogger('console').toStdout()
 
 var $ctx
 var $reqHead
@@ -37,7 +37,7 @@ export default pipeline($ => $
   .handleMessageEnd(
     function () {
       var ib = $ctx.inbound
-      console.log({
+      logger.log({
         remoteAddr: ib.remoteAddress,
         remotePort: ib.remotePort,
         req: $reqHead,
@@ -48,7 +48,7 @@ export default pipeline($ => $
         resTime: $resTime,
         endTime: Date.now(),
         broker: $ctx.target,
-        clientID: $ctx.connMsg?.tail?.clientID,
+        clientID: $ctx.connMsg?.payload?.clientID,
       })
     }
   )

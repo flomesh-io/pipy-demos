@@ -8,13 +8,10 @@ var plugins = config.plugins.map(
 
 var $ctx
 var $inbound
-pipy.listen(8000, $ => $.connect('localhost:1883'))
 
 pipy.listen(config.listen, $ => $
   .onStart(ib => void ($inbound = ib))
-  // .dump('>')
   .decodeMQTT()
-  // .dump('>>')
   .handleMessageStart(function (msg) {
     $ctx = {
       protocalLevel: msg.head.protocolLevel,
@@ -28,9 +25,9 @@ pipy.listen(config.listen, $ => $
     }
   })
   .handleMessageEnd(
-    function(tail) {
+    function(msg) {
       if ($ctx.type == 'CONNECT') {
-        $ctx.connMsg.tail = tail.payload
+        $ctx.connMsg.payload = msg.payload
       }
     }
   )
