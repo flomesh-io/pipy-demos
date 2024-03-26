@@ -32,7 +32,10 @@ It will start a proxy listening on `1884` and forward the request to broker whic
 The configuration of proxy locates at [config.yaml](./config.yaml).
 
 - `listen`: the port proxy will listen on,
-- `listenTLS`: the TLS port proxy will listen on. Disable TSL by commentting.
+- `listenTLS`
+  - `port`: the TLS port proxy will listen on. Disable TSL by commentting.
+  - `cert`: cert file location
+  - `key`: key file location
 - `brokers`: the list of upstream MQTT brokers,
 - `limits`: rate limit configuration which can limit connection rate and message publising rate,
 - `tracing`: proxy will generate a traceid and embed it header with name as value of `key`,
@@ -44,7 +47,10 @@ The configuration of proxy locates at [config.yaml](./config.yaml).
 
 ```yaml
 listen: 1884
-listenTLS: 11884
+listenTLS: 
+  port: 11884
+  cert: ./secret/server-cert.pem
+  key: ./secret/server-key.pem
 brokers:
   - localhost:1883
 limits:

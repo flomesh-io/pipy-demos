@@ -41,12 +41,12 @@ if (config.listen) {
 
 if (config.listenTLS) {
   var cert = new crypto.CertificateChain(
-    pipy.load('secret/server-cert.pem')
+    pipy.load(config.listenTLS.cert)
   )
   var key = new crypto.PrivateKey(
-    pipy.load('secret/server-key.pem')
+    pipy.load(config.listenTLS.key)
   )
-  pipy.listen(config.listenTLS, $ => $
+  pipy.listen(config.listenTLS.port, $ => $
     .onStart(ib => void ($inbound = ib))
     .acceptTLS({
       certificate: { cert, key }

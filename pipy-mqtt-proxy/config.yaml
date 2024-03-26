@@ -1,5 +1,8 @@
 listen: 1884
-listenTLS: 11884
+listenTLS: 
+  port: 11884
+  cert: ./secret/server-cert.pem
+  key: ./secret/server-key.pem
 brokers:
   - localhost:1883
 limits:
