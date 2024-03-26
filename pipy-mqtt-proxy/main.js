@@ -12,7 +12,9 @@ pipy.listen(8000, $ => $.connect('localhost:1883'))
 
 pipy.listen(config.listen, $ => $
   .onStart(ib => void ($inbound = ib))
+  // .dump('>')
   .decodeMQTT()
+  // .dump('>>')
   .handleMessageStart(function (msg) {
     $ctx = {
       protocalLevel: msg.head.protocolLevel,
@@ -22,9 +24,16 @@ pipy.listen(config.listen, $ => $
     }
     //record connection message
     if (msg?.head?.type == 'CONNECT') {
-      $ctx.connMsg = msg
+      $ctx.connMsg = {head: msg.head}
     }
   })
+  .handleMessageEnd(
+    function(tail) {
+      if ($ctx.type == 'CONNECT') {
+        $ctx.connMsg.tail = tail.payload
+      }
+    }
+  )
   .pipe(plugins, () => $ctx)
   .encodeMQTT()
 )

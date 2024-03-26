@@ -48,7 +48,7 @@ export default pipeline($ => $
         resTime: $resTime,
         endTime: Date.now(),
         broker: $ctx.target,
-        clientID: $ctx.connMsg?.head?.clientID,
+        clientID: $ctx.connMsg?.tail?.clientID,
       })
     }
   )

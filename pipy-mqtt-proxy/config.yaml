@@ -8,6 +8,8 @@ limits:
   pub:
     rate: 20
     blockInput: true
+tracing:
+  key: traceid
 tags:
   proxy: pipy
 ids:
@@ -17,9 +19,11 @@ ids:
   deny:
     - client-3
 creds:
-  flomesh: pipy  
+  username: flomesh
+  password: pipy  
 plugins:
   - tag
+  - tracing
   - logger
   - metrics
   # - identify

@@ -8,6 +8,7 @@ This is a demonstration of Pipy working as a MQTT Proxy, providing features:
 - Message tagging
 - Logging
 - Metrics
+- Tracing
 - Rate limit
 - Client identifier black/white list
 - Authentication base on username and password
@@ -33,9 +34,10 @@ The configuration of proxy locates at [config.yaml](./config.yaml).
 - `listen`: the port proxy will listen on
 - `brokers`: the list of upstream MQTT brokers
 - `limits`: rate limit configuration which can limit connection rate and message publising rate
-- `tags`: the tags list you prefer to embed in message header
+- `tracing`: proxy will generate a traceid and embed it header with name as value of `key`
+- `tags`: the tags list you prefer to embed in message header. It accepts key-value pair.
 - `ids`: the client id white and black list
-- `creds`: username and password
+- `creds`: username and password configured as key-value pair.
 - `plugins`: the feature list proxy provides. You can customize its features by commenting or uncommenting. 
 But please keep the `balancer` in the end.
 
@@ -50,6 +52,8 @@ limits:
   pub:
     rate: 20
     blockInput: true
+tracing:
+  key: traceid
 tags:
   proxy: pipy
 ids:
@@ -59,13 +63,16 @@ ids:
   deny:
     - client-3
 creds:
-  flomesh: pipy  
+  username: flomesh
+  password: pipy  
 plugins:
   - tag
+  - tracing
   - logger
   - metrics
   # - identify
   # - credential
   - throttle
   - balancer
+
 ```

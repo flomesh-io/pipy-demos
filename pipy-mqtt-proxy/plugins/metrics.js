@@ -7,14 +7,14 @@ export default pipeline($ => $
   .handleMessageStart(
     function (msg) {
       msg?.head?.type === 'PUBLISH' && (
-        $publishCounter.withLabels($ctx.connMsg?.head?.clientID, msg?.head?.topicName, msg?.head?.qos).increase()
+        $publishCounter.withLabels($ctx.connMsg?.tail?.clientID, msg?.head?.topicName, msg?.head?.qos).increase()
       )
     }
   )
   .pipeNext()
   .handleMessageStart(
     function (msg) {
-      $publishACKCounter.withLabels($ctx.connMsg?.head?.clientID, msg?.head?.qos).increase()
+      $publishACKCounter.withLabels($ctx.connMsg?.tail?.clientID, msg?.head?.qos).increase()
     }
   )
 )

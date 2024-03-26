@@ -14,9 +14,7 @@ export default pipeline($ => $
     }
   ).pipe(function() {
     if ($ctx.type == 'CONNECT') {
-      console.log(`$username: ${JSON.stringify($username)}`)
-      console.log(`$password: ${JSON.stringify($password)}`)
-      if (!$username || config.creds[$username] !== $password) {
+      if (!$username || !(config?.creds?.username === $username && config?.creds?.password === $password)) {
         return 'deny'
       }
     }
