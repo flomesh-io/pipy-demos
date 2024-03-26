@@ -16,6 +16,6 @@ export default pipeline($ => $
   .encodeMQTT()
   .connect(() => $conn.target)
   .decodeMQTT({
-    protocolLevel: () => $conn.protocalLevel,
+    protocolLevel: () => $conn.protocolLevel,
   })
 )
