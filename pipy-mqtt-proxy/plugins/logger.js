@@ -37,7 +37,7 @@ export default pipeline($ => $
   .handleMessageEnd(
     function () {
       var ib = $ctx.inbound
-      logger.log({
+      console.log({
         remoteAddr: ib.remoteAddress,
         remotePort: ib.remotePort,
         req: $reqHead,
