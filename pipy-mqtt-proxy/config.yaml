@@ -23,6 +23,6 @@ plugins:
   - logger
   - metrics
   # - identify
-  - credential
+  # - credential
   - throttle
   - balancer
